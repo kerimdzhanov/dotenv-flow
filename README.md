@@ -1,9 +1,9 @@
 # dotenv-flow
 
 [dotenv](https://github.com/motdotla/dotenv) is a zero-dependency module that loads environment variables
-from a `.env` file into `[process.env](https://nodejs.org/docs/latest/api/process.html#process_process_env)`.
+from a `.env` file into [`process.env`](https://nodejs.org/docs/latest/api/process.html#process_process_env).
 
-*dotenv-flow*, in turn, extends *dotenv* adding an ability to have multiple env files, e.g `.env`,
+**dotenv-flow**, in turn, extends **dotenv** adding an ability to have multiple env files, e.g `.env`,
 `.env.development`, `.env.test`, `env.production`, `.env.local`, `env.development.local` etc,.
 
 
@@ -38,7 +38,7 @@ When running, your `process.env` will have keys and values you've defined in you
 
 ## `NODE_ENV`-specific env files
 
-Actually *dotenv-flow* is have no any "predefined" environments, so you may have whatever environment names you want,
+Actually **dotenv-flow** have no any "predefined" environments, so you may have whatever environment names you want,
 but it's a good practice to use world's universally recognized environment names like `development`, `test`, `production`,
 and also frequently used `qa` or `stage`.
 
@@ -67,11 +67,11 @@ Or if you are on Windows:
 
 ## Files under version control
 
-*dotenv* doesn't recommend to commit `.env` file and it is true when you are using *dotenv* with its single `.env` file approach.
-*dotenv-flow*, in turn, has a different way to manage your environment variables:
+**dotenv** doesn't recommend to commit `.env` file and it is true when you are using **dotenv** with its single `.env` file approach.
+**dotenv-flow**, in turn, has a different way to manage your environment variables:
 
 The main reason is to not commit database passwords, API keys and other secure things.
-For this purposes you'll need to have `.env.local` file that is an individual environment specific and *must* be ignored by VCS.
+For this purposes you'll need to have `.env.local` file that is an individual environment specific and **must** be ignored by VCS.
 
 Thus, the `.env` file became tracked by VCS and it is a really good place to have the default values for all environment variables used by your application.
 
@@ -102,14 +102,14 @@ Since multiple `.env*` files are loaded together at the same time, all the varia
 
 1) `.env` file have a lowest priority over all, keep the most default values there;
 2) `.env.local` file have a priority over the `.env`, create it if you want to overwrite the default values only for your environment-specific needs;
-3) `NODE_ENV`-specific env files (`.env.development`, `.env.test`, etc.) have a priority over the default `.env` and `.env.local` files;
-4) `NODE_ENV`-specific local env files (`.env.development.local`, `.env.production.local`, etc.) have a highest priority;
+3) `NODE_ENV`-specific env files (`.env.development`, `.env.test`, etc.) have a priority over the default `.env` and `.env.local` files, keep default `NODE_ENV`-specific environment variables here;
+4) `NODE_ENV`-specific local env files (`.env.development.local`, `.env.production.local`, etc.) have a highest priority, as with `.env.local`, create them only if you need to overwrite `NODE_ENV`-specific default values for your individual needs;
 5) if any variables are already defined in the environment before reading from `.env*`, they will not be overwritten, thus having the higher priority over defined in any env file;
 
 
 ## API reference
 
-As an extension of *dotenv*, the *dotenv-flow* has the same API adding the following initialization `options`:
+As an extension of **dotenv**, the **dotenv-flow** has the same API adding the following initialization `options`:
 
 ##### `default_node_env`
 
