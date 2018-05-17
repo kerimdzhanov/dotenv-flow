@@ -6,6 +6,7 @@ from a `.env` file into [`process.env`](https://nodejs.org/docs/latest/api/proce
 **dotenv-flow**, in turn, extends **dotenv** adding an ability to have multiple env files, e.g `.env`,
 `.env.development`, `.env.test`, `env.production`, `.env.local`, `env.development.local` etc,.
 
+[![npm version](https://badge.fury.io/js/dotenv-flow.svg)](https://badge.fury.io/js/dotenv-flow)
 [![Build Status](https://travis-ci.org/kerimdzhanov/dotenv-flow.svg?branch=master)](https://travis-ci.org/kerimdzhanov/dotenv-flow)
 [![dependencies status](https://david-dm.org/kerimdzhanov/dotenv-flow/status.svg)](https://david-dm.org/kerimdzhanov/dotenv-flow)
 
