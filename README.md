@@ -7,6 +7,7 @@ from a `.env` file into [`process.env`](https://nodejs.org/docs/latest/api/proce
 `.env.development`, `.env.test`, `env.production`, `.env.local`, `env.development.local` etc,.
 
 [![Build Status](https://travis-ci.org/kerimdzhanov/dotenv-flow.svg?branch=master)](https://travis-ci.org/kerimdzhanov/dotenv-flow)
+[![dependencies status](https://david-dm.org/kerimdzhanov/dotenv-flow/status.svg)](https://david-dm.org/kerimdzhanov/dotenv-flow)
 
 ## Installation
 
