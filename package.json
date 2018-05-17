@@ -19,6 +19,9 @@
     "url": "https://github.com/kerimdzhanov/dotenv-flow/issues"
   },
   "main": "lib/dotenv-flow.js",
+  "files": [
+    "lib/dotenv-flow.js"
+  ],
   "dependencies": {
     "dotenv": "^5.0.1"
   },
