@@ -167,6 +167,22 @@ describe('dotenv-flow', () => {
     });
   });
 
+  describe("when the project doesn't contain the default `.env` file", () => {
+    it('merges environment variables from existing `*.env` files', async () => {
+      const environment = {
+        NODE_ENV: 'development'
+      };
+
+      const variables = await execHelper('no-default-env', 'print-env.js', environment);
+
+      expect(variables).to.include({
+        LOCAL_ENV_VAR: 'ok',
+        DEVELOPMENT_ENV_VAR: 'ok',
+        DEVELOPMENT_LOCAL_VAR: 'ok'
+      });
+    });
+  });
+
   describe('when an environment variable is provided from the shell', () => {
     it('has a highest priority over those that are defined in `.env*` files', async () => {
       const environment = {
