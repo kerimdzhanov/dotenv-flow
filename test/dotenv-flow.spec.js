@@ -27,7 +27,7 @@ async function execHelper(fixture, helper, env = {}) {
 }
 
 describe('dotenv-flow', () => {
-  describe('when project contains `.env` file', () => {
+  describe('when the project contains the `.env` file', () => {
     it('reads environment variables from this file', async () => {
       const variables = await execHelper('env', 'print-env.js');
 
@@ -37,7 +37,7 @@ describe('dotenv-flow', () => {
     });
   });
 
-  describe('when project contains `.env.local` file', () => {
+  describe('when the project contains the `.env.local` file', () => {
     it('merges environment variables prioritizing the `.env.local`', async () => {
       const variables = await execHelper('env-local', 'print-env.js');
 
@@ -65,7 +65,7 @@ describe('dotenv-flow', () => {
     });
   });
 
-  describe('when project contains node_env-specific files', () => {
+  describe('when the project contains node_env-specific files', () => {
     it('merges environment variables prioritizing the node_env-specific', async () => {
       let environment, variables;
 
@@ -116,7 +116,7 @@ describe('dotenv-flow', () => {
     });
   });
 
-  describe('when project contains node_env-specific `*.local` files', () => {
+  describe('when the project contains node_env-specific `*.local` files', () => {
     it('merges environment variables prioritizing the node_env-specific local', async () => {
       let environment, variables;
 
