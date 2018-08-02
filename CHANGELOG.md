@@ -1,3 +1,14 @@
+<a name="0.1.0-beta.4"></a>
+# [0.1.0-beta.4](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.1.0-beta.3...v0.1.0-beta.4) (2018-08-02)
+
+
+### Features
+
+* **dotenv:** make "cleanup dotenv defined variables" optional ([9495bcb](https://github.com/kerimdzhanov/dotenv-flow/commit/9495bcb))
+* **dotenv-flow:** make `.config()` to return object like "dotenv" ([882c53c](https://github.com/kerimdzhanov/dotenv-flow/commit/882c53c))
+
+
+
 <a name="0.1.0-beta.3"></a>
 # [0.1.0-beta.3](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.1.0-beta.2...v0.1.0-beta.3) (2018-07-17)
 
