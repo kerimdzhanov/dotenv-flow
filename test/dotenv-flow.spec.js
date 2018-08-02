@@ -264,6 +264,25 @@ describe('dotenv-flow', () => {
     });
   });
 
+  describe('when the `purge_dotenv` option is set to `true`', () => {
+    const directory = getFixtureProjectPath('node-env-local');
+
+    it('fixes the `.env*` files priority issue', async () => {
+      const environment = {
+        NODE_ENV: 'development'
+      };
+
+      const variables = await execHelper('print-env-with-purge.js', directory, environment);
+
+      expect(variables).to.include({
+        NODE_ENV: 'development',
+        DEFAULT_ENV_VAR: 'ok',
+        DEVELOPMENT_ENV_VAR: 'ok',
+        DEVELOPMENT_LOCAL_VAR: 'ok'
+      });
+    });
+  });
+
   describe('the returning object', () => {
     describe('when the parsing is successful', () => {
       const directory = getFixtureProjectPath('node-env-local');

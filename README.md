@@ -136,10 +136,25 @@ require('dotenv-flow').config({ default_node_env: 'development' });
 With the `cwd` initialization option you can specify a path to `.env*` files directory:
 
 ```js
-require('dotenv-flow').config({ default_node_env: 'development' });
+require('dotenv-flow').config({ cwd: '/path/to/my/project' });
 ```
 
 If the option is not provided, the current working directory is used.
+
+##### `purge_dotenv`
+
+In some cases the original "dotenv" library can be used by one of the dependent
+npm modules. It causes calling the original `dotenv.config()` that loads
+the `.env` file from your project before you can call `dotenv-flow.config()`.
+
+Such cases breaks `.env*` files priority because the previously loaded
+environment variables are treated as shell-defined thus having the higher priority.
+
+Setting the `purge_dotenv` option to `true` can gracefully fix this issue.
+
+```js
+require('dotenv-flow').config({ purge_dotenv: true });
+```
 
 
 ## Contributing
