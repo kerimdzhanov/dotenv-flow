@@ -94,8 +94,9 @@ Summarizing the above, you can have the following `.env*` files in your project:
 Here is an example of `.gitignore`/`.hgignore` entry to keep it clean:
 
 ```
-# local environment files
-.env{,.*}.local
+# local .env* files
+.env.local
+.env.*.local
 ```
 
 
