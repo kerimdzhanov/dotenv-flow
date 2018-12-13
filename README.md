@@ -1,12 +1,3 @@
-# MODIFIED
-
-Added '--mode VAR' switch so that the package acts like the vue-cli package.
-
-If the --mode siwtch exists and has a varaible passwed to it, the corrosponding env file will be used instead of the env file for the NODE_ENV. 
-
-If a NODE_ENV already exists it will be ignored in the .env file
-
-
 # dotenv-flow
 
 [dotenv](https://github.com/motdotla/dotenv) is a zero-dependency module that loads environment variables
@@ -15,6 +6,9 @@ from a `.env` file into [`process.env`](https://nodejs.org/docs/latest/api/proce
 **dotenv-flow**, in turn, extends **dotenv** adding an ability to have multiple env files, e.g `.env`,
 `.env.development`, `.env.test`, `env.production`, `.env.local`, `env.development.local` etc,.
 
+[![npm version](https://badge.fury.io/js/dotenv-flow.svg)](https://badge.fury.io/js/dotenv-flow)
+[![Build Status](https://travis-ci.org/kerimdzhanov/dotenv-flow.svg?branch=master)](https://travis-ci.org/kerimdzhanov/dotenv-flow)
+[![dependencies status](https://david-dm.org/kerimdzhanov/dotenv-flow/status.svg)](https://david-dm.org/kerimdzhanov/dotenv-flow)
 
 ## Installation
 
