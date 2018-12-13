@@ -8,15 +8,16 @@
     "development",
     "test",
     "production",
-    "local"
+    "local",
+    "vue"
   ],
-  "homepage": "https://github.com/kerimdzhanov/dotenv-flow#readme",
+  "homepage": "https://github.com/solaris765/dotenv-flow#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kerimdzhanov/dotenv-flow.git"
+    "url": "git+https://github.com/solaris765/dotenv-flow.git"
   },
   "bugs": {
-    "url": "https://github.com/kerimdzhanov/dotenv-flow/issues"
+    "url": "https://github.com/solaris765/dotenv-flow/issues"
   },
   "main": "lib/dotenv-flow.js",
   "files": [
@@ -35,6 +36,6 @@
     "test": "mocha test/dotenv-flow.spec.js",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0"
   },
-  "author": "Dan Kerimdzhanov",
+  "author": "Dan Kerimdzhanov, Mason Rhodes",
   "license": "MIT"
 }
