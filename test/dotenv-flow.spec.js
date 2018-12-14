@@ -274,13 +274,12 @@ describe('dotenv-flow', () => {
 
       expect(variables).to.include({
         DEFAULT_ENV_VAR: "ok",
-        DEFAULT_ENV_VAR: 'ok',
-        DEVELOPMENT_ENV_VAR: 'ok'
+        DEFAULT_ENV_VAR: 'ok'
       });
 
       environment = {
         NODE_ENV: 'production',
-        CUSTOM_ENV: 'test'
+        CUSTOM_ENV: 'development'
       };
 
       variables = await execHelper('print-env-with-node_env.js', directory, environment);
