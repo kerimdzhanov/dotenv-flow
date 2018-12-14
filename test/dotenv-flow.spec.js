@@ -288,9 +288,7 @@ describe('dotenv-flow', () => {
         NODE_ENV: 'production',
         DEFAULT_ENV_VAR: 'ok',
         DEVELOPMENT_ENV_VAR: 'ok',
-        DEVELOPMENT_LOCAL_VAR: 'ok',
-        PRODUCTION_ENV_VAR: "should be overwritten by `.env.production`",
-        PRODUCTION_LOCAL_VAR: "should be overwritten by `.env.production.local`",
+        DEVELOPMENT_LOCAL_VAR: 'ok'
       });
     });
   });
