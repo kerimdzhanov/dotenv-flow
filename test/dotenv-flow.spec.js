@@ -279,7 +279,8 @@ describe('dotenv-flow', () => {
       });
 
       environment = {
-        NODE_ENV: 'production'
+        NODE_ENV: 'production',
+        CUSTOM_ENV: 'test'
       };
 
       variables = await execHelper('print-env-with-node_env.js', directory, environment);
