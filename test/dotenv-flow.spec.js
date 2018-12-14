@@ -274,8 +274,8 @@ describe('dotenv-flow', () => {
 
       expect(variables).to.include({
         DEFAULT_ENV_VAR: "ok",
-        TEST_ENV_VAR: "ok",
-        TEST_LOCAL_VAR: "ok"
+        DEFAULT_ENV_VAR: 'ok',
+        DEVELOPMENT_ENV_VAR: 'ok'
       });
 
       environment = {
@@ -287,12 +287,10 @@ describe('dotenv-flow', () => {
       expect(variables).to.include({
         NODE_ENV: 'production',
         DEFAULT_ENV_VAR: 'ok',
-        DEVELOPMENT_ENV_VAR: 'should be overwritten by `.env.development`',
-        DEVELOPMENT_LOCAL_VAR: 'should be overwritten by `.env.development.local`',
+        DEVELOPMENT_ENV_VAR: 'ok',
+        DEVELOPMENT_LOCAL_VAR: 'ok',
         PRODUCTION_ENV_VAR: "should be overwritten by `.env.production`",
         PRODUCTION_LOCAL_VAR: "should be overwritten by `.env.production.local`",
-        TEST_ENV_VAR: "ok",
-        TEST_LOCAL_VAR: "ok"
       });
     });
   });
