@@ -264,6 +264,35 @@ describe('dotenv-flow', () => {
     });
   });
 
+  describe('when the `node_env` option is provided', () => {
+    const directory = getFixtureProjectPath('node-env-local');
+
+    it('uses that value to load specific `.env.*` files with a different `NODE_ENV` value set', async () => {
+      let environment, variables;
+
+      variables = await execHelper('print-env-with-node_env.js', directory);
+
+      expect(variables).to.include({
+        DEFAULT_ENV_VAR: "ok",
+        DEFAULT_ENV_VAR: 'ok'
+      });
+
+      environment = {
+        NODE_ENV: 'production',
+        CUSTOM_ENV: 'development'
+      };
+
+      variables = await execHelper('print-env-with-node_env.js', directory, environment);
+
+      expect(variables).to.include({
+        NODE_ENV: 'production',
+        DEFAULT_ENV_VAR: 'ok',
+        DEVELOPMENT_ENV_VAR: 'ok',
+        DEVELOPMENT_LOCAL_VAR: 'ok'
+      });
+    });
+  });
+
   describe('when the `purge_dotenv` option is set to `true`', () => {
     const directory = getFixtureProjectPath('node-env-local');
 
