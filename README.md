@@ -113,12 +113,33 @@ Since multiple `.env*` files are loaded together at the same time, all the varia
 
 ## API reference
 
-As an extension of **dotenv**, the **dotenv-flow** has the same API adding the following initialization `options`:
+As an extension of [dotenv](https://github.com/motdotla/dotenv), **dotenv-flow** has the same API adding the following initialization options:
+
+##### `node_env`
+
+By default, the module refers the `NODE_ENV` environment variable to detect the environment to use.
+With the `node_env` option you can force the module to use your custom environment value independent of `process.env.NODE_ENV`.
+
+###### Example
+```js
+require('dotenv-flow').config({
+  node_env: process.argv[2] || 'development'
+});
+```
 
 ##### `default_node_env`
 
-You may want to set the default value for `process.env.NODE_ENV` to `"development"`.
-To do this you can just have the following initialization code:
+If the `NODE_ENV` environment variable is not set, the module doesn't load/parse any `NODE_ENV`-specific files at all.
+Therefore, you may want to use `"development"` as the default environment.
+
+###### Example
+```js
+require('dotenv-flow').config({
+  default_node_env: 'development'
+});
+```
+
+Just make a note that all the following initialization examples are also equivalent:
 
 ```js
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
@@ -126,11 +147,20 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 require('dotenv-flow').config();
 ```
 
-but with `default_node_env` you can have much prettier one-liner:
+```js
+require('dotenv-flow').config({
+  node_env: process.env.NODE_ENV || 'development'
+});
+```
 
 ```js
-require('dotenv-flow').config({ default_node_env: 'development' });
+require('dotenv-flow').config({
+  node_env: process.env.NODE_ENV,
+  default_node_env: 'development'
+});
 ```
+
+All the examples above, considers the value of `process.env.NODE_ENV` at first, and if not set, uses `"development"` as the value by default. You can just choose one that looks prettier for you.
 
 ##### `cwd`
 
