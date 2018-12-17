@@ -232,50 +232,13 @@ describe('dotenv-flow', () => {
     });
   });
 
-  describe('when the `default_node_env` option is provided', () => {
-    const directory = getFixtureProjectPath('node-env-local');
-
-    it('uses that value as a default for `process.env.NODE_ENV`', async () => {
-      let environment, variables;
-
-      variables = await execHelper('print-env-with-default.js', directory);
-
-      expect(variables).to.include({
-        NODE_ENV: 'development',
-        DEFAULT_ENV_VAR: 'ok',
-        DEVELOPMENT_ENV_VAR: 'ok',
-        DEVELOPMENT_LOCAL_VAR: 'ok'
-      });
-
-      environment = {
-        NODE_ENV: 'production'
-      };
-
-      variables = await execHelper('print-env-with-default.js', directory, environment);
-
-      expect(variables).to.include({
-        NODE_ENV: 'production',
-        DEFAULT_ENV_VAR: 'ok',
-        DEVELOPMENT_ENV_VAR: 'should be overwritten by `.env.development`',
-        DEVELOPMENT_LOCAL_VAR: 'should be overwritten by `.env.development.local`',
-        PRODUCTION_ENV_VAR: 'ok',
-        PRODUCTION_LOCAL_VAR: 'ok'
-      });
-    });
-  });
-
   describe('when the `node_env` option is provided', () => {
     const directory = getFixtureProjectPath('node-env-local');
 
-    it('uses that value to load specific `.env.*` files with a different `NODE_ENV` value set', async () => {
+    it('uses that value to load node_env-specific files independent of `NODE_ENV`', async () => {
       let environment, variables;
 
-      variables = await execHelper('print-env-with-node_env.js', directory);
-
-      expect(variables).to.include({
-        DEFAULT_ENV_VAR: "ok",
-        DEFAULT_ENV_VAR: 'ok'
-      });
+      // --
 
       environment = {
         NODE_ENV: 'production',
@@ -289,6 +252,54 @@ describe('dotenv-flow', () => {
         DEFAULT_ENV_VAR: 'ok',
         DEVELOPMENT_ENV_VAR: 'ok',
         DEVELOPMENT_LOCAL_VAR: 'ok'
+      });
+
+      // --
+
+      environment = {
+        NODE_ENV: 'production',
+        CUSTOM_ENV: 'test'
+      };
+
+      variables = await execHelper('print-env-with-node_env.js', directory, environment);
+
+      expect(variables).to.include({
+        NODE_ENV: 'production',
+        DEFAULT_ENV_VAR: 'ok',
+        TEST_ENV_VAR: 'ok',
+        TEST_LOCAL_VAR: 'ok'
+      });
+    });
+  });
+
+  describe('when the `default_node_env` option is provided', () => {
+    const directory = getFixtureProjectPath('node-env-local');
+
+    it('uses that value as a default environment', async () => {
+      let environment, variables;
+
+      // --
+
+      variables = await execHelper('print-env-with-default.js', directory);
+
+      expect(variables).to.include({
+        DEFAULT_ENV_VAR: 'ok',
+        DEVELOPMENT_ENV_VAR: 'ok',
+        DEVELOPMENT_LOCAL_VAR: 'ok'
+      });
+
+      environment = {
+        NODE_ENV: 'production'
+      };
+
+      // --
+
+      variables = await execHelper('print-env-with-default.js', directory, environment);
+
+      expect(variables).to.include({
+        DEFAULT_ENV_VAR: 'ok',
+        PRODUCTION_ENV_VAR: 'ok',
+        PRODUCTION_LOCAL_VAR: 'ok'
       });
     });
   });
