@@ -113,26 +113,31 @@ Since multiple `.env*` files are loaded together at the same time, all the varia
 
 ## API reference
 
-As an extension of [dotenv](https://github.com/motdotla/dotenv), **dotenv-flow** has the same API adding the following initialization options:
+As an extension of [dotenv](https://github.com/motdotla/dotenv), **dotenv-flow** has the same API with a little difference in initialization options described below.
 
-##### `node_env`
+
+#### `.config(options)`
+
+The main initialization function that reads and parses the contents of your `.env.*` files,
+merges the results into `process.env.*` (respecting the definition priority), and returns an `Object`
+with a `parsed` key containing the resulting key/values or an `error` key if the initialization is failed.
+
+##### `options.node_env`
 
 By default, the module refers the `NODE_ENV` environment variable to detect the environment to use.
-With the `node_env` option you can force the module to use your custom environment value independent of `process.env.NODE_ENV`.
+With the `node_env` option you can force the module to use your custom environment value independent of `process.env.NODE_ENV`:
 
-###### Example
 ```js
 require('dotenv-flow').config({
   node_env: process.argv[2] || 'development'
 });
 ```
 
-##### `default_node_env`
+##### `options.default_node_env`
 
 If the `NODE_ENV` environment variable is not set, the module doesn't load/parse any `NODE_ENV`-specific files at all.
-Therefore, you may want to use `"development"` as the default environment.
+Therefore, you may want to use `"development"` as the default environment:
 
-###### Example
 ```js
 require('dotenv-flow').config({
   default_node_env: 'development'
@@ -162,17 +167,31 @@ require('dotenv-flow').config({
 
 All the examples above, considers the value of `process.env.NODE_ENV` at first, and if not set, uses `"development"` as the value by default. You can just choose one that looks prettier for you.
 
-##### `cwd`
+##### `options.cwd`
 
 With the `cwd` initialization option you can specify a path to `.env*` files directory:
 
 ```js
-require('dotenv-flow').config({ cwd: '/path/to/my/project' });
+require('dotenv-flow').config({
+  cwd: '/path/to/my/project'
+});
 ```
 
 If the option is not provided, the current working directory is used.
 
-##### `purge_dotenv`
+##### `options.encoding`
+
+You can specify the encoding of your files containing environment variables. The default value is `'utf8'`.
+
+_[inherited from dotenv [`options.encoding`](https://github.com/motdotla/dotenv#encoding)]_
+
+```js
+require('dotenv-flow').config({
+  encoding: 'base64'
+});
+```
+
+##### `options.purge_dotenv`
 
 In some cases the original "dotenv" library can be used by one of the dependent
 npm modules. It causes calling the original `dotenv.config()` that loads
@@ -184,7 +203,26 @@ environment variables are treated as shell-defined thus having the higher priori
 Setting the `purge_dotenv` option to `true` can gracefully fix this issue.
 
 ```js
-require('dotenv-flow').config({ purge_dotenv: true });
+require('dotenv-flow').config({
+  purge_dotenv: true
+});
+```
+
+
+#### `.parse(source)`
+
+An internal function that parses the contents of your file containing environment variables.
+Accepts a `String` or `Buffer` and returns an `Object` with the parsed keys and values.
+
+_[inherited from [`dotenv.parse(source)`](https://github.com/motdotla/dotenv#parse)]_
+
+```js
+const dotenvFlow = require('dotenv-flow');
+
+const source = Buffer.from('FOO=bar\nBAZ=qux');
+const config = dotenvFlow.parse(source);
+
+console.log(typeof config, config); // > object { FOO: 'bar', BAZ: 'qux' }
 ```
 
 
