@@ -1,3 +1,13 @@
+<a name="0.2.0-rc.1"></a>
+# [0.2.0-rc.1](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.1.0...v0.2.0-rc.1) (2018-12-17)
+
+
+### Features
+
+* **options:** add `options.node_env` (defaults to `process.env.NODE_ENV`), PR [#6](https://github.com/kerimdzhanov/dotenv-flow/issues/6), closes [#5](https://github.com/kerimdzhanov/dotenv-flow/issues/5) ([30db488](https://github.com/kerimdzhanov/dotenv-flow/commit/30db488))
+
+
+
 <a name="0.1.0"></a>
 # [0.1.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.1.0-beta.4...v0.1.0) (2018-08-02)
 
