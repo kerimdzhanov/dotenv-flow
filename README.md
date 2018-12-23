@@ -1,10 +1,12 @@
 # dotenv-flow
 
-[dotenv](https://github.com/motdotla/dotenv) is a zero-dependency module that loads environment variables
-from a `.env` file into [`process.env`](https://nodejs.org/docs/latest/api/process.html#process_process_env).
+<img src="https://raw.githubusercontent.com/kerimdzhanov/dotenv-flow/master/dotenv-flow.png" alt="dotenv-flow" width="200" height="100" align="right" />
 
-**dotenv-flow**, in turn, extends **dotenv** adding an ability to have multiple env files, e.g `.env`,
-`.env.development`, `.env.test`, `env.production`, `.env.local`, `env.development.local` etc,.
+[dotenv](https://github.com/motdotla/dotenv) is a module that loads environment variables from a `.env` file into [`process.env`](https://nodejs.org/docs/latest/api/process.html#process_process_env).
+
+**dotenv-flow**, in turn, extends **dotenv** adding an ability to have multiple env files like `.env.development`, `.env.test`, `env.production`, etc., loading them depending on the current process environment (defaults to `process.env.NODE_ENV`).
+
+Storing configuration in _environment variables_ separate from code and grouping them by environments like _development_, _test_ and _production_ is based on [The Twelve-Factor App](https://12factor.net/config) methodology.
 
 [![npm version](https://badge.fury.io/js/dotenv-flow.svg)](https://badge.fury.io/js/dotenv-flow)
 [![Build Status](https://travis-ci.org/kerimdzhanov/dotenv-flow.svg?branch=master)](https://travis-ci.org/kerimdzhanov/dotenv-flow)
