@@ -1,5 +1,5 @@
-<a name="0.2.0-rc.1"></a>
-# [0.2.0-rc.1](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.1.0...v0.2.0-rc.1) (2018-12-17)
+<a name="0.2.0"></a>
+# [0.2.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.1.0...v0.2.0) (2018-12-23)
 
 
 ### Features
