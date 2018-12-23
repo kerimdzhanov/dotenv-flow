@@ -1,10 +1,10 @@
 # dotenv-flow
 
-<img src="https://raw.githubusercontent.com/kerimdzhanov/dotenv-flow/master/dotenv-flow.png" alt="dotenv-flow" width="200" height="100" align="right" />
+<img src="https://raw.githubusercontent.com/kerimdzhanov/dotenv-flow/master/dotenv-flow@2x.png" alt="dotenv-flow" width="280" height="140" align="right" />
 
-[dotenv](https://github.com/motdotla/dotenv) is a module that loads environment variables from a `.env` file into [`process.env`](https://nodejs.org/docs/latest/api/process.html#process_process_env).
+[dotenv](https://github.com/motdotla/dotenv) is a zero-dependency npm module that loads environment variables from a `.env` file into [`process.env`](https://nodejs.org/docs/latest/api/process.html#process_process_env).
 
-**dotenv-flow**, in turn, extends **dotenv** adding an ability to have multiple env files like `.env.development`, `.env.test`, `env.production`, etc., loading them depending on the current process environment (defaults to `process.env.NODE_ENV`).
+**dotenv-flow**, in turn, extends **dotenv** adding the ability to have multiple env files like `.env.development`, `.env.test`, `env.production`, etc., loading them depending on the current process environment (defaults to `process.env.NODE_ENV`).
 
 Storing configuration in _environment variables_ separate from code and grouping them by environments like _development_, _test_ and _production_ is based on [The Twelve-Factor App](https://12factor.net/config) methodology.
 
