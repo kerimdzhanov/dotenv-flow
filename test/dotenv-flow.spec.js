@@ -52,6 +52,14 @@ describe('dotenv-flow', () => {
         .to.have.property('DEFAULT_ENV_VAR')
         .that.is.equal('ok');
     });
+
+    it('expands nested ENV variables', async () => {
+      const variables = await execHelper('print-env.js', directory);
+
+      expect(variables)
+        .to.have.property('EXPANSION_TEST')
+        .that.is.equal('TEST:EXPANDED');
+    });
   });
 
   describe('when the project contains the `.env.local` file', () => {
