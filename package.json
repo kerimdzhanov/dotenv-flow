@@ -1,6 +1,6 @@
 {
   "name": "dotenv-flow",
-  "version": "0.2.0",
+  "version": "0.3.0-rc.1",
   "description": "Loads environment variables from `.env.[development|test|production][.local]` files",
   "keywords": [
     "dotenv",
@@ -33,7 +33,7 @@
   },
   "scripts": {
     "test": "mocha test/dotenv-flow.spec.js",
-    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0"
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
   },
   "author": "Dan Kerimdzhanov",
   "license": "MIT"

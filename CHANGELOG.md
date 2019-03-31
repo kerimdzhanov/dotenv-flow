@@ -1,4 +1,17 @@
-<a name="0.2.0"></a>
+# [0.3.0-rc.1](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.2.0...v0.3.0-rc.1) (2019-03-31)
+
+
+### chore
+
+* **dotenv:** update `dotenv` up to `v7.0.0` ([a5ab798](https://github.com/kerimdzhanov/dotenv-flow/commit/a5ab798))
+
+
+### BREAKING CHANGES
+
+* **dotenv:** Removed the `.load()` alias in order to comply with the `dotenv` API.
+
+
+
 # [0.2.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.1.0...v0.2.0) (2018-12-23)
 
 
@@ -8,12 +21,10 @@
 
 
 
-<a name="0.1.0"></a>
 # [0.1.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.1.0-beta.4...v0.1.0) (2018-08-02)
 
 
 
-<a name="0.1.0-beta.4"></a>
 # [0.1.0-beta.4](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.1.0-beta.3...v0.1.0-beta.4) (2018-08-02)
 
 
@@ -24,7 +35,6 @@
 
 
 
-<a name="0.1.0-beta.3"></a>
 # [0.1.0-beta.3](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.1.0-beta.2...v0.1.0-beta.3) (2018-07-17)
 
 
@@ -34,7 +44,6 @@
 
 
 
-<a name="0.1.0-beta.2"></a>
 # [0.1.0-beta.2](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.1.0-beta.1...v0.1.0-beta.2) (2018-06-10)
 
 
@@ -44,8 +53,4 @@
 
 
 
-<a name="0.1.0-beta.1"></a>
 # 0.1.0-beta.1 (2018-05-17)
-
-
-
