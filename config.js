@@ -1,3 +1,3 @@
 (function() {
-  require('./lib/dotenv-flow').configure()
+  require('./lib/dotenv-flow').config()
 })()
