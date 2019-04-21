@@ -1,3 +1,15 @@
+# [0.4.0-rc.1](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.3.0...v0.4.0-rc.1) (2019-04-21)
+
+
+### Features
+
+* **dotenv-flow/config:**
+  * add support for `-r dotenv-flow/config`, closes [#11](https://github.com/kerimdzhanov/dotenv-flow/issues/11) ([d94d21c](https://github.com/kerimdzhanov/dotenv-flow/commit/d94d21c))
+  * add ability to configure `dotenv-flow/config` via environment variables, relates [#11](https://github.com/kerimdzhanov/dotenv-flow/issues/11) ([0118d27](https://github.com/kerimdzhanov/dotenv-flow/commit/0118d27))
+  * add ability to configure `dotenv-flow/config` via command line switches, relates [#11](https://github.com/kerimdzhanov/dotenv-flow/issues/11) ([ee87e39](https://github.com/kerimdzhanov/dotenv-flow/commit/ee87e39))
+
+
+
 # [0.3.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.2.0...v0.3.0) (2019-04-07)
 
 
