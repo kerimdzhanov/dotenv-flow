@@ -85,4 +85,35 @@ describe('dotenv-flow/config', () => {
       PRODUCTION_ONLY_VAR: 'ok'
     });
   });
+
+  it('supports configuration via command line options', async () => {
+    let variables = await execWithPreload(getFixtureProjectPath('env'), {
+      args: [
+        '--default-node-env=development',
+        '--dotenv-flow-path', getFixtureProjectPath('node-env-local')
+      ]
+    });
+
+    expect(variables).to.include({
+      DEFAULT_ENV_VAR: 'ok',
+      DEVELOPMENT_ENV_VAR: 'ok',
+      DEVELOPMENT_LOCAL_VAR: 'ok'
+    });
+
+    // --
+
+    variables = await execWithPreload(getFixtureProjectPath('env'), {
+      args: [
+        '--node-env=production',
+        '--default-node-env=development',
+        '--dotenv-flow-path', getFixtureProjectPath('node-env-local')
+      ]
+    });
+
+    expect(variables).to.include({
+      DEFAULT_ENV_VAR: 'ok',
+      PRODUCTION_ENV_VAR: 'ok',
+      PRODUCTION_LOCAL_VAR: 'ok'
+    });
+  });
 });

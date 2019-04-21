@@ -21,6 +21,7 @@
   "main": "lib/dotenv-flow.js",
   "files": [
     "lib/env-options.js",
+    "lib/cli-options.js",
     "config.js"
   ],
   "dependencies": {
