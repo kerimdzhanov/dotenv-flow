@@ -1,4 +1,4 @@
-# [0.4.0-rc.1](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.3.0...v0.4.0-rc.1) (2019-04-21)
+# [0.4.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.3.0...v0.4.0) (2019-04-29)
 
 
 ### Features
@@ -13,7 +13,7 @@
 # [0.3.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.2.0...v0.3.0) (2019-04-07)
 
 
-### chore
+### Features
 
 * **dotenv:** update `dotenv` up to `v7.0.0` ([a5ab798](https://github.com/kerimdzhanov/dotenv-flow/commit/a5ab798))
 
