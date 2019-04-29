@@ -16,13 +16,13 @@ Storing configuration in _environment variables_ separate from code and grouping
 
 Using NPM:
 
-```bash
+```sh
 $ npm install dotenv-flow --save
 ```
 
 Using Yarn:
 
-```bash
+```sh
 $ yarn add dotenv-flow
 ```
 
@@ -41,7 +41,7 @@ and if the `NODE_ENV` environment variable is provided, the `.env.${NODE_ENV}` f
 When running, your `process.env` will have keys and values you've defined in your `.env*` files.
 
 
-## `NODE_ENV`-specific env files
+### `NODE_ENV`-specific env files
 
 Actually **dotenv-flow** have no any "predefined" environments, so you may have whatever environment names you want,
 but it's a good practice to use world's universally recognized environment names like `development`, `test`, `production`,
@@ -68,6 +68,23 @@ Or if you are on Windows:
 > SET NODE_ENV=production
 > node your_script.js
 ```
+
+`--node-env` switch is also supported:
+
+```sh
+$ node your_script.js --node-env=production
+```
+
+
+## Variables overwriting/priority
+
+Since multiple `.env*` files are loaded together at the same time, all the variables defined there are merged in the following order:
+
+1) `.env` file have a lowest priority over all, keep the most default values there;
+2) `.env.local` file have a priority over the `.env`, create it if you want to overwrite the default values only for your environment-specific needs;
+3) `NODE_ENV`-specific env files (`.env.development`, `.env.test`, etc.) have a priority over the default `.env` and `.env.local` files, keep default `NODE_ENV`-specific environment variables here;
+4) `NODE_ENV`-specific local env files (`.env.development.local`, `.env.production.local`, etc.) have a highest priority, as with `.env.local`, create them only if you need to overwrite `NODE_ENV`-specific default values for your individual needs;
+5) if any variables are already defined in the environment before reading from `.env*`, they will not be overwritten, thus having the higher priority over defined in any env file;
 
 
 ## Files under version control
@@ -100,17 +117,6 @@ Here is an example of `.gitignore`/`.hgignore` entry to keep it clean:
 .env.local
 .env.*.local
 ```
-
-
-## Variables overwriting/priority
-
-Since multiple `.env*` files are loaded together at the same time, all the variables defined there are merged in the following order:
-
-1) `.env` file have a lowest priority over all, keep the most default values there;
-2) `.env.local` file have a priority over the `.env`, create it if you want to overwrite the default values only for your environment-specific needs;
-3) `NODE_ENV`-specific env files (`.env.development`, `.env.test`, etc.) have a priority over the default `.env` and `.env.local` files, keep default `NODE_ENV`-specific environment variables here;
-4) `NODE_ENV`-specific local env files (`.env.development.local`, `.env.production.local`, etc.) have a highest priority, as with `.env.local`, create them only if you need to overwrite `NODE_ENV`-specific default values for your individual needs;
-5) if any variables are already defined in the environment before reading from `.env*`, they will not be overwritten, thus having the higher priority over defined in any env file;
 
 
 ## API reference
@@ -237,13 +243,13 @@ Feel free to dive in! [Open an issue](https://github.com/kerimdzhanov/dotenv-flo
 
 Using NPM:
 
-```bash
+```sh
 $ npm test
 ```
 
 Using Yarn:
 
-```bash
+```sh
 $ yarn test
 ```
 
