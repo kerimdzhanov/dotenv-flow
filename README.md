@@ -76,6 +76,29 @@ $ node your_script.js --node-env=production
 ```
 
 
+### Preload
+
+Alternatively, you can preload **dotenv-flow** using node's [`-r` (`--require`) command line option](https://nodejs.org/api/cli.html#cli_r_require_module).
+
+```sh
+$ NODE_ENV=production node -r dotenv-flow/config your_script.js
+```
+
+or:
+
+```sh
+$ node -r dotenv-flow/config your_script.js --node-env=production
+```
+
+You can also use environment variables to set configuration options when preloading the `dotenv-flow/config`:
+
+```sh
+$ DOTENV_FLOW_PATH=/path/to/env-files-dir node -r dotenv-flow/config your_script.js
+```
+
+Refer to the [`dotenv-flow/config` options](#dotenv-flowconfig-options) section to see all available options.
+
+
 ## Variables overwriting/priority
 
 Since multiple `.env*` files are loaded together at the same time, all the variables defined there are merged in the following order:
@@ -175,13 +198,13 @@ require('dotenv-flow').config({
 
 All the examples above, considers the value of `process.env.NODE_ENV` at first, and if not set, uses `"development"` as the value by default. You can just choose one that looks prettier for you.
 
-##### `options.cwd`
+##### `options.path`
 
-With the `cwd` initialization option you can specify a path to `.env*` files directory:
+With the `path` initialization option you can specify a path to `.env*` files directory:
 
 ```js
 require('dotenv-flow').config({
-  cwd: '/path/to/my/project'
+  path: '/path/to/env-files-dir'
 });
 ```
 
@@ -231,6 +254,37 @@ const source = Buffer.from('FOO=bar\nBAZ=qux');
 const config = dotenvFlow.parse(source);
 
 console.log(typeof config, config); // > object { FOO: 'bar', BAZ: 'qux' }
+```
+
+
+## `dotenv-flow/config` options
+
+When preloading **dotenv-flow** using the node's `-r` switch you can use the following configuration options:
+
+### Environment variables
+
+* `NODE_ENV` => [`options.node_env`](#optionsnode_env);
+* `DEFAULT_NODE_ENV` => [`options.default_node_env`](#optionsdefault_node_env);
+* `DOTENV_FLOW_PATH` => [`options.path`](#optionspath);
+* `DOTENV_FLOW_ENCODING` => [`options.encoding`](#optionsencoding);
+* `DOTENV_FLOW_PURGE_DOTENV` => [`options.purge_dotenv`](#optionspurge_dotenv);
+
+```sh
+$ NODE_ENV=production DOTENV_FLOW_PATH=/path/to/env-files-dir node -r dotenv-flow/config your_script.js
+```
+
+### Command line switches
+
+* `--node-env` => [`options.node_env`](#optionsnode_env);
+* `--default-node-env` => [`options.default_node_env`](#optionsdefault_node_env);
+* `--dotenv-flow-path` => [`options.path`](#optionspath);
+* `--dotenv-flow-encoding` => [`options.encoding`](#optionsencoding);
+* `--dotenv-flow-purge-dotenv` => [`options.purge_dotenv`](#optionspurge_dotenv);
+
+Don't forget to separate **dotenv-flow/config**-specific CLI switches with `--` because they're unrecognized by **Node.js**:
+
+```sh
+$ node -r dotenv-flow/config your_script.js -- --dotenv-flow-encoding=latin1 --dotenv-flow-path=...
 ```
 
 
