@@ -310,4 +310,4 @@ $ yarn test
 
 ## License
 
-Licensed under [MIT](LICENSE) © 2018 Dan Kerimdzhanov
+Licensed under [MIT](LICENSE) © 2018-2019 Dan Kerimdzhanov
