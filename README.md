@@ -4,9 +4,7 @@
 
 [dotenv](https://github.com/motdotla/dotenv) is a zero-dependency npm module that loads environment variables from a `.env` file into [`process.env`](https://nodejs.org/docs/latest/api/process.html#process_process_env).
 
-**dotenv-flow**, in turn, extends **dotenv** adding the ability to have multiple env files like `.env.development`, `.env.test`, `.env.production`, etc., also allowing the values to be overwritten locally by defining them in the appropriate `.env*.local` file.
-
-The `.env*` files loading strategy is controlled by `process.env.NODE_ENV` (by default) and merged in a prioritized order explained in the [variables overwriting/priority](#variables-overwritingpriority) section above.
+**dotenv-flow** extends **dotenv** adding the ability to have multiple `.env*` files like `.env.development`, `.env.test` and `.env.production`, also allowing defined variables to be overwritten individually in the appropriate `.env*.local` file.
 
 Storing configuration in _environment variables_ separate from code and grouping them by environments like _development_, _test_ and _production_ is based on [The Twelve-Factor App](https://12factor.net/config) methodology.
 
@@ -44,40 +42,51 @@ When running, your `process.env` will have keys and values you've defined in you
 
 Additionally, if the `NODE_ENV` environment variable is set, then`.env.${NODE_ENV}` and the appropriate `.env.${NODE_ENV}.local` files are also be loaded.
 
-For example, let's suppose you have the following `.env.*` files in your project:
+For example, let's suppose that you have the following `.env.*` files in your project:
 
-```text
+```sh
 # .env
 
 DATABASE_HOST=127.0.0.1
 DATABASE_PORT=27017
 DATABASE_USER=default
+DATABASE_PASS=
 DATABASE_NAME=my_app
 ```
 
-```text
+```sh
 # .env.local
 
 DATABASE_USER=hacker
 DATABASE_PASS=super-secret
 ```
 
-```text
+```sh
 # .env.development
 
 DATABASE_NAME=my_app_dev
 ```
 
-```text
+```sh
 # .env.test
 
 DATABASE_NAME=my_app_test
 ```
 
-```text
+```sh
 # .env.production
 
 DATABASE_NAME=my_app_prod
+```
+
+```sh
+# .env.production.local
+
+DATABASE_HOST=10.0.0.32
+DATABASE_PORT=27017
+DATABASE_USER=devops
+DATABASE_PASS=1qa2ws3ed4rf5tg6yh
+DATABASE_NAME=application_storage
 ```
 
 ```js
@@ -92,13 +101,13 @@ console.log('database pass:', process.env.DATABASE_PASS);
 console.log('database name:', process.env.DATABASE_NAME);
 ```
 
-And if you run `your_script.js` in `development` environment, like this:
+And if you run `your_script.js` in **development** environment, like this:
 
 ```sh
 $ NODE_ENV=development node your_scrips.js
 ```
 
-you'll get the following output:
+then you'll get the following output:
 
 ```text
 database host: 127.0.0.1
@@ -108,10 +117,26 @@ database pass: super-secret
 database name: my_app_dev
 ```
 
-And as you may already understood, the `.env*.local` files should be excluded from version control system (refer the [motivation](#motivation) section above to learn more).
+Or if you run the same script in **production** environment:
+
+```sh
+$ NODE_ENV=production node your_script.js
+```
+
+you'll get the following:
+
+```text
+database host: 10.0.0.32
+database port: 27017
+database user: devops
+database pass: 1qa2ws3ed4rf5tg6yh
+database name: application_storage
+```
+
+And as you may already understood, the `.env*.local` files should be ignored by your version control system (refer the [Files under version control](#files-under-version-control) section below to learn more), and you'll have the `.env.production.local` file only on your production deployment machine.
 
 
-### `NODE_ENV`-specific `.env.*` files
+### `NODE_ENV`-specific env files
 
 Actually **dotenv-flow** have no any "predefined" environments, so you may have whatever environment names you want,
 but it's a good practice to use world's universally recognized environment names like `development`, `test`, `production`, and also frequently used `qa` or `stage`.
@@ -138,7 +163,7 @@ If you are on Windows:
 > node your_script.js
 ```
 
-Or even better use [cross-env](https://github.com/kentcdodds/cross-env) to run independent of platform:
+Or even better, use [cross-env](https://github.com/kentcdodds/cross-env) to make it work independent of platform:
 
 ```sh
 $ cross-env NODE_ENV=production node your_script.js
@@ -171,30 +196,18 @@ You can also use environment variables to set configuration options when preload
 $ DOTENV_FLOW_PATH=/path/to/env-files-dir node -r dotenv-flow/config your_script.js
 ```
 
-Refer to the [`dotenv-flow/config` options](#dotenv-flowconfig-options) section to see all available options.
+Refer to the [`dotenv-flow/config` options](#dotenv-flowconfig-options) section below to see all available options.
 
 
 ## Files under version control
 
-#### TL;DR
-
-Here is an example of the `.gitignore` (or `.hgignore`) file entry to keep it clean:
-
-```
-# local .env* files
-.env.local
-.env.*.local
-```
-
-#### Motivation
-
-The general thing here is not to commit production database passwords, API keys and other sensitive things to your source code repository,
-but it's ok to keep default database connections, ports, hosts, etc., like `localhost:3000` and so on as a fallback to keep your code simple and always "just work".
+The general thing here – is not to commit production database passwords, API keys and other sensitive things to your source code repository,
+but it's still ok to keep default database connections, ports, hosts, etc., like `localhost:3000` and so on as a fallback to keep your code clean, simple and always "just work".
 
 Understanding the above, we have the following approach:
 
-You can keep all the fallback values in the `.env` file that is loaded in any environment by default.
-And also it is a good place to have all the application used environment variables here thus having a reference of environment variables that are used by your application on the whole.
+You can keep all the fallback values in the default `.env` file, that (if exists) will always be loaded independently from any environment.
+And also it is a good place to have all the application used environment variables here, thus having a reference of environment variables that are used by your application on the whole.
 So it's a good reason to share the `.env` file with other developers in your team, but keep all the sensitive data on your own (or production) machine locally in the `.env.local` file.
 
 It is not necessary, but also a good practice to use `NODE_ENV` to control the environment to run your application in.
@@ -212,7 +225,15 @@ Summarizing the above, you can have the following `.env*` files in your project:
  * `.env.test.local` – for individual test environment values, **ignored** by VCS
  * `.env.production.local` – for production environment values (DB passwords, API keys, etc.), **ignored** by VCS
 
-Make a note that `.env.*` files names may vary in your project, just keep in mind that **`.env*.local` files must be untracked/ignored by your CVS**.
+Make a note that `.env.*` file names may vary in your project depending on your own needs/preferences, just keep in mind that `.env*.local` files should be untracked (ignored) by your version control system.
+
+Here is an example of the `.gitignore` (or `.hgignore`) file entry to keep it clean:
+
+```gitignore
+# local .env* files
+.env.local
+.env.*.local
+```
 
 
 ## Variables overwriting/priority
