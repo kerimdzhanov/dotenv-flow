@@ -32,6 +32,11 @@
 * **options:** add `options.node_env` (defaults to `process.env.NODE_ENV`), PR [#6](https://github.com/kerimdzhanov/dotenv-flow/issues/6), closes [#5](https://github.com/kerimdzhanov/dotenv-flow/issues/5) ([30db488](https://github.com/kerimdzhanov/dotenv-flow/commit/30db488))
 
 
+### BREAKING CHANGES
+
+* **dotenv-flow:** `process.env.NODE_ENV` can now be used separately/isolated from the module and no longer be set to default value (when the `default_node_env` option is provided).
+
+
 
 # [0.1.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.1.0-beta.4...v0.1.0) (2018-08-02)
 
