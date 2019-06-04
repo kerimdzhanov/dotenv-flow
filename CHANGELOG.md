@@ -1,3 +1,13 @@
+# [1.0.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.4.0...v1.0.0) (2019-06-04)
+
+
+#### Nothing changed
+
+The version is released to follow the semver rules setting the baseline of the package.
+Starting from here all the "BREAKING CHANGES" will always be released with bumping up the major version.
+
+
+
 # [0.4.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.3.0...v0.4.0) (2019-04-29)
 
 
