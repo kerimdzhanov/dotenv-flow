@@ -1,3 +1,17 @@
+# [2.0.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v1.0.0...v2.0.0) (2019-06-04)
+
+
+### Features
+
+* **dotenv:** update `dotenv` up to `v8.0.0` ([5ff1a42](https://github.com/kerimdzhanov/dotenv-flow/commit/5ff1a42))
+
+
+### BREAKING CHANGES
+
+* **dotenv:** Dropping Node.js v6 support because of end-of-life
+
+
+
 # [1.0.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v0.4.0...v1.0.0) (2019-06-04)
 
 
