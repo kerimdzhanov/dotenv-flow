@@ -1,6 +1,6 @@
 'use strict';
 
-require('../../lib/dotenv-flow').config({
+require('../../../lib/dotenv-flow').config({
   default_node_env: 'development'
 });
 

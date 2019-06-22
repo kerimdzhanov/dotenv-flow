@@ -1,7 +1,7 @@
 'use strict';
 
 const {expect} = require('chai');
-const env_options = require('../lib/env-options');
+const env_options = require('../../lib/env-options');
 
 describe('env_options', () => {
   it('maps related environment variables to options', () => {
