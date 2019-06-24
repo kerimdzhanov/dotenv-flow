@@ -370,7 +370,7 @@ describe('dotenv-flow (API)', () => {
       });
 
       it('loads the `.env.local` file', () => {
-        $dotenvFiles['/path/to/project/.env'] = 'LOCAL_ENV_VAR=ok';
+        $dotenvFiles['/path/to/project/.env.local'] = 'LOCAL_ENV_VAR=ok';
 
         expect(process.env)
           .to.not.have.property('LOCAL_ENV_VAR');
@@ -384,7 +384,7 @@ describe('dotenv-flow (API)', () => {
       it('uses `process.cwd()` as a default `path`', () => {
         $processCwd.returns('/current/working/directory');
 
-        $dotenvFiles['/current/working/directory/.env'] = 'DEFAULT_ENV_VAR=CWD';
+        $dotenvFiles['/current/working/directory/.env'] = 'DEFAULT_ENV_VAR=ok';
 
         dotenvFlow.config();
 
@@ -392,7 +392,7 @@ describe('dotenv-flow (API)', () => {
           .to.have.been.calledOnce;
 
         expect(process.env)
-          .to.have.property('DEFAULT_ENV_VAR', 'CWD');
+          .to.have.property('DEFAULT_ENV_VAR', 'ok');
       });
     });
 
@@ -414,7 +414,7 @@ describe('dotenv-flow (API)', () => {
       });
 
       it('loads the `.env.local` file', () => {
-        $dotenvFiles['/path/to/project/.env'] = 'LOCAL_ENV_VAR=ok';
+        $dotenvFiles['/path/to/project/.env.local'] = 'LOCAL_ENV_VAR=ok';
 
         expect(process.env)
           .to.not.have.property('LOCAL_ENV_VAR');
@@ -466,7 +466,7 @@ describe('dotenv-flow (API)', () => {
       });
 
       it('loads the `.env.local` file', () => {
-        $dotenvFiles['/path/to/project/.env'] = 'LOCAL_ENV_VAR=ok';
+        $dotenvFiles['/path/to/project/.env.local'] = 'LOCAL_ENV_VAR=ok';
 
         expect(process.env)
           .to.not.have.property('LOCAL_ENV_VAR');
@@ -541,7 +541,7 @@ describe('dotenv-flow (API)', () => {
       });
 
       it('loads the `.env.local` file', () => {
-        $dotenvFiles['/path/to/project/.env'] = 'LOCAL_ENV_VAR=ok';
+        $dotenvFiles['/path/to/project/.env.local'] = 'LOCAL_ENV_VAR=ok';
 
         expect(process.env)
           .to.not.have.property('LOCAL_ENV_VAR');
