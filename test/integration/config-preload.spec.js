@@ -43,7 +43,7 @@ async function execWithPreload(cwd, {env = {}, args = []} = {}) {
   }
 }
 
-describe('dotenv-flow/config', () => {
+describe('dotenv-flow/config (preload)', () => {
   it('preloads `.env*` files defined environment variables', async () => {
     const variables = await execWithPreload(getFixtureProjectPath('env'));
 

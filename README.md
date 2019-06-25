@@ -247,18 +247,48 @@ Since multiple `.env*` files are loaded together at the same time, all the varia
 5) if any variables are already defined in the environment before reading from `.env*`, they will not be overwritten, thus having the higher priority over defined in any env file;
 
 
+## `dotenv-flow/config` options
+
+When preloading **dotenv-flow** using the node's `-r` switch you can use the following configuration options:
+
+### Environment variables
+
+* `NODE_ENV` => [`options.node_env`](#optionsnode_env);
+* `DEFAULT_NODE_ENV` => [`options.default_node_env`](#optionsdefault_node_env);
+* `DOTENV_FLOW_PATH` => [`options.path`](#optionspath);
+* `DOTENV_FLOW_ENCODING` => [`options.encoding`](#optionsencoding);
+* `DOTENV_FLOW_PURGE_DOTENV` => [`options.purge_dotenv`](#optionspurge_dotenv);
+
+```sh
+$ NODE_ENV=production DOTENV_FLOW_PATH=/path/to/env-files-dir node -r dotenv-flow/config your_script.js
+```
+
+### Command line switches
+
+* `--node-env` => [`options.node_env`](#optionsnode_env);
+* `--default-node-env` => [`options.default_node_env`](#optionsdefault_node_env);
+* `--dotenv-flow-path` => [`options.path`](#optionspath);
+* `--dotenv-flow-encoding` => [`options.encoding`](#optionsencoding);
+* `--dotenv-flow-purge-dotenv` => [`options.purge_dotenv`](#optionspurge_dotenv);
+
+Don't forget to separate **dotenv-flow/config**-specific CLI switches with `--` because they're unrecognized by **Node.js**:
+
+```sh
+$ node -r dotenv-flow/config your_script.js -- --dotenv-flow-encoding=latin1 --dotenv-flow-path=...
+```
+
+
 ## API reference
 
-As an extension of [dotenv](https://github.com/motdotla/dotenv), **dotenv-flow** has the same API with a little difference in initialization options described below.
+#### `.config([options]) => object`
 
+The main entry point function that parses the contents of your `.env*` files, merges the results and appends to `process.env.*`.
 
-#### `.config(options)`
-
-The main initialization function that reads and parses the contents of your `.env.*` files,
-merges the results into `process.env.*` (respecting the definition priority), and returns an `Object`
-with a `parsed` key containing the resulting key/values or an `error` key if the initialization is failed.
+Also, like the original module ([dotenv](https://github.com/motdotla/dotenv)), it returns an `object` with the `parsed` property containing the resulting key/values or the `error` property if the initialization is failed.
 
 ##### `options.node_env`
+
+###### Type: `string`
 
 By default, the module refers the `NODE_ENV` environment variable to detect the environment to use.
 With the `node_env` option you can force the module to use your custom environment value independent of `process.env.NODE_ENV`:
@@ -270,6 +300,8 @@ require('dotenv-flow').config({
 ```
 
 ##### `options.default_node_env`
+
+###### Type: `string`
 
 If the `NODE_ENV` environment variable is not set, the module doesn't load/parse any `NODE_ENV`-specific files at all.
 Therefore, you may want to use `"development"` as the default environment:
@@ -305,6 +337,8 @@ All the examples above, considers the value of `process.env.NODE_ENV` at first, 
 
 ##### `options.path`
 
+###### Type: `string`
+
 With the `path` initialization option you can specify a path to `.env*` files directory:
 
 ```js
@@ -317,9 +351,9 @@ If the option is not provided, the current working directory is used.
 
 ##### `options.encoding`
 
-You can specify the encoding of your files containing environment variables. The default value is `'utf8'`.
+###### Type: `string`
 
-_[inherited from dotenv [`options.encoding`](https://github.com/motdotla/dotenv#encoding)]_
+You can specify the encoding of your files containing environment variables. The default value is `'utf8'`.
 
 ```js
 require('dotenv-flow').config({
@@ -328,6 +362,8 @@ require('dotenv-flow').config({
 ```
 
 ##### `options.purge_dotenv`
+
+###### Type: `Boolean`
 
 In some cases the original "dotenv" library can be used by one of the dependent
 npm modules. It causes calling the original `dotenv.config()` that loads
@@ -344,53 +380,234 @@ require('dotenv-flow').config({
 });
 ```
 
+---
 
-#### `.parse(source)`
+The following API is considered as internal, but it is also exposed to give the ability to be used programmatically by your own needs.
 
-An internal function that parses the contents of your file containing environment variables.
-Accepts a `String` or `Buffer` and returns an `Object` with the parsed keys and values.
 
-_[inherited from [`dotenv.parse(source)`](https://github.com/motdotla/dotenv#parse)]_
+#### `.listDotenvFiles(dirname, [options]) => string[]`
+
+Returns a list of `.env*` filenames depending on the given `options.node_env`. The resulting list is ordered by the env files priority from lowest to highest.
+
+Also, make a note that the `.env.local` file is not included when the value of `node_env` is "test"`, since normally you expect tests to produce the same results for everyone.
+
+
+##### Parameters:
+
+##### `dirname`
+
+###### Type: `string`
+
+A path to `.env*` files' directory.
+
+##### `[options.node_env]`
+
+###### Type: `string`
+
+The node environment (development/test/production/etc,).
+
+
+##### Returns:
+
+###### Type: `string[]`
+
+A list of `.env*` filenames.
+
+
+##### Example:
 
 ```js
 const dotenvFlow = require('dotenv-flow');
 
-const source = Buffer.from('FOO=bar\nBAZ=qux');
-const config = dotenvFlow.parse(source);
+const filenames = dotenvFlow.listDotenvFiles('/path/to/project', { node_env: 'development' });
 
-console.log(typeof config, config); // > object { FOO: 'bar', BAZ: 'qux' }
+console.log(filenames); // will output the following:
+// > [ '/path/to/project/.env',
+// >   '/path/to/project/.env.local',
+// >   '/path/to/project/.env.development',
+// >   '/path/to/project/.env.development.local' ]
 ```
 
 
-## `dotenv-flow/config` options
+#### `.parse(filenames, [options]) => object`
 
-When preloading **dotenv-flow** using the node's `-r` switch you can use the following configuration options:
+Parses the content of a given file(s) to use the result programmatically. Accepts a filename or a list of filenames and returns a map of the parsed key/values as an object.
 
-### Environment variables
+When several filenames are given, the parsed variables are merged into a single object using the "overwrite" strategy.
 
-* `NODE_ENV` => [`options.node_env`](#optionsnode_env);
-* `DEFAULT_NODE_ENV` => [`options.default_node_env`](#optionsdefault_node_env);
-* `DOTENV_FLOW_PATH` => [`options.path`](#optionspath);
-* `DOTENV_FLOW_ENCODING` => [`options.encoding`](#optionsencoding);
-* `DOTENV_FLOW_PURGE_DOTENV` => [`options.purge_dotenv`](#optionspurge_dotenv);
+
+##### Parameters:
+
+##### `filenames`
+
+###### Type: `string|string[]`
+
+A filename or a list of filenames to parse.
+
+##### `[options.encoding]`
+
+###### Type: `string`
+
+An optional encoding for reading files.
+
+
+##### Returns:
+
+###### Type: `object`
+
+The resulting map of `{ env_var: value }` as an object.
+
+
+##### Example:
 
 ```sh
-$ NODE_ENV=production DOTENV_FLOW_PATH=/path/to/env-files-dir node -r dotenv-flow/config your_script.js
+# .env
+
+FOO=bar
+BAZ=bar
 ```
-
-### Command line switches
-
-* `--node-env` => [`options.node_env`](#optionsnode_env);
-* `--default-node-env` => [`options.default_node_env`](#optionsdefault_node_env);
-* `--dotenv-flow-path` => [`options.path`](#optionspath);
-* `--dotenv-flow-encoding` => [`options.encoding`](#optionsencoding);
-* `--dotenv-flow-purge-dotenv` => [`options.purge_dotenv`](#optionspurge_dotenv);
-
-Don't forget to separate **dotenv-flow/config**-specific CLI switches with `--` because they're unrecognized by **Node.js**:
 
 ```sh
-$ node -r dotenv-flow/config your_script.js -- --dotenv-flow-encoding=latin1 --dotenv-flow-path=...
+# .env.local
+
+BAZ=qux
 ```
+
+```js
+const dotenvFlow = require('dotenv-flow');
+
+const variables = dotenvFlow.parse([
+  '/path/to/project/.env',
+  '/path/to/project/.env.local'
+]);
+
+console.log(typeof variables, variables); // > object { FOO: 'bar', BAZ: 'qux' }
+```
+
+
+#### `.load(filenames, [options]) => object`
+
+Loads variables defined in a given file(s) into `process.env`.
+
+When several filenames are given, the parsed variables are merged using the "overwrite" strategy.
+
+Merging the parsed environment variables into `process.env` is done using the "append" strategy, thus giving the higher priority to the environment variables that are predefined by the shell.
+
+
+##### Parameters:
+
+##### `filenames`
+
+###### Type: `string|string[]`
+
+A filename or a list of filenames to load.
+
+##### `[options.encoding]`
+
+###### Type: `string`
+
+An optional encoding for reading files.
+
+
+##### Returns:
+
+###### Type: `object`
+
+The returning object have the same shape as the `.config()`'s, it will contain the `parsed` property with a parsed content of a given file(s) or the `error` property if the parsing is failed.
+
+
+##### Example:
+
+```sh
+# .env
+
+FOO=bar
+BAZ=bar
+```
+
+```sh
+# .env.local
+
+BAZ=qux
+```
+
+```js
+const dotenvFlow = require('dotenv-flow');
+
+process.env.BAZ = 'Yay!';
+
+const result = dotenvFlow.load([
+  '/path/to/project/.env',
+  '/path/to/project/.env.local'
+]);
+
+console.log(typeof result, result); // > object { parsed: { FOO: 'bar', BAZ: 'qux' } }
+
+console.log(process.env.FOO); // > 'bar'
+console.log(process.env.BAZ); // > 'Yay!'
+```
+
+
+#### `.unload(filenames, [options]) => void`
+
+Unloads variables defined in a given file(s) from `process.env`.
+
+The environment variables that are predefined (i.e. by the shell) will not be unloaded.
+
+
+##### Parameters:
+
+##### `filenames`
+
+###### Type: `string|string[]`
+
+A filename or a list of filenames to unload.
+
+##### `[options.encoding]`
+
+###### Type: `string`
+
+An optional encoding for reading files.
+
+
+##### Example:
+
+```sh
+# .env
+
+FOO=bar
+BAZ=bar
+```
+
+```sh
+# .env.local
+
+BAZ=qux
+```
+
+```js
+const dotenvFlow = require('dotenv-flow');
+
+process.env.BAZ = 'Yay!';
+
+dotenvFlow.load([
+  '/path/to/project/.env',
+  '/path/to/project/.env.local'
+]);
+
+console.log(process.env.FOO); // > 'bar'
+console.log(process.env.BAZ); // > 'Yay!'
+
+dotenvFlow.unload([
+  '/path/to/project/.env',
+  '/path/to/project/.env.local'
+]);
+
+console.log(process.env.FOO); // > undefined
+console.log(process.env.BAZ); // > 'Yay!'
+```
+
+---
 
 
 ## Contributing

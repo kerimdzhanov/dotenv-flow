@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 
-require('../../lib/dotenv-flow').config({
+require('../../../lib/dotenv-flow').config({
   purge_dotenv: true
 });
 

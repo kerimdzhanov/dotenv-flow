@@ -1,6 +1,6 @@
 'use strict';
 
-require('../../lib/dotenv-flow').config({
+require('../../../lib/dotenv-flow').config({
   node_env: process.env.CUSTOM_ENV
 });
 

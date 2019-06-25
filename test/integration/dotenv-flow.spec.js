@@ -41,7 +41,7 @@ async function execHelper(helper, cwd, env = {}) {
   }
 }
 
-describe('dotenv-flow', () => {
+describe('dotenv-flow.config (entry point)', () => {
   describe('when the project contains the `.env` file', () => {
     const directory = getFixtureProjectPath('env');
 
@@ -345,7 +345,7 @@ describe('dotenv-flow', () => {
       });
     });
 
-    describe('when an error is occurred while reading `*.env` files', () => {
+    describe('if an error occurred while reading `*.env` files', () => {
       it('includes the `error` property that is a reference to the occurred error object', (done) => {
         tmp.dir({ unsafeCleanup: true }, (err, directory) => {
           if (err) {

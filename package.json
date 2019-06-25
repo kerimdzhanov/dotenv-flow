@@ -31,10 +31,12 @@
     "chai": "^4.2.0",
     "conventional-changelog-cli": "^2.0.21",
     "mocha": "^6.1.4",
+    "sinon": "^7.3.2",
+    "sinon-chai": "^3.3.0",
     "tmp": "^0.1.0"
   },
   "scripts": {
-    "test": "mocha test/*.spec.js",
+    "test": "mocha -r mocha.conf.js test/{unit,integration}/*.spec.js",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
   },
   "author": "Dan Kerimdzhanov",
