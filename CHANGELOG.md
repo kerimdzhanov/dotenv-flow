@@ -1,3 +1,17 @@
+# [3.0.0-rc.1](https://github.com/kerimdzhanov/dotenv-flow/compare/v2.0.0...v3.0.0-rc.1) (2019-06-30)
+
+
+### Features
+
+* **dotenv-flow:** redesign and expose the internal API, [#16](https://github.com/kerimdzhanov/dotenv-flow/issues/16) ([266b9e2](https://github.com/kerimdzhanov/dotenv-flow/commit/266b9e2))
+
+
+### BREAKING CHANGES
+
+* **dotenv-flow:** The `.parse` method's signature is changed. Now it takes the filename or a list of filenames to parse.
+
+
+
 # [2.0.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v1.0.0...v2.0.0) (2019-06-04)
 
 
