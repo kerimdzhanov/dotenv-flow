@@ -12,7 +12,7 @@ Storing configuration in _environment variables_ separate from code and grouping
 [![npm downloads](https://badgen.net/npm/dw/dotenv-flow)](https://www.npmjs.com/package/dotenv-flow)
 [![Build Status](https://travis-ci.org/kerimdzhanov/dotenv-flow.svg?branch=master)](https://travis-ci.org/kerimdzhanov/dotenv-flow)
 [![dependencies status](https://david-dm.org/kerimdzhanov/dotenv-flow/status.svg)](https://david-dm.org/kerimdzhanov/dotenv-flow)
-![node version](https://badgen.net/npm/node/dotenv-flow)
+[![node version](https://badgen.net/npm/node/dotenv-flow)](https://nodejs.org/en/about/releases)
 
 
 ## Installation
@@ -289,10 +289,9 @@ The main entry point function that parses the contents of your `.env*` files, me
 Also, like the original module ([dotenv](https://github.com/motdotla/dotenv)), it returns an `object` with the `parsed` property containing the resulting key/values or the `error` property if the initialization is failed.
 
 ##### `options.node_env`
-
 ###### Type: `string`
+###### Default: `process.env.NODE_ENV`
 
-By default, the module refers the `NODE_ENV` environment variable to detect the environment to use.
 With the `node_env` option you can force the module to use your custom environment value independent of `process.env.NODE_ENV`:
 
 ```js
@@ -302,11 +301,11 @@ require('dotenv-flow').config({
 ```
 
 ##### `options.default_node_env`
-
 ###### Type: `string`
+###### Default: _undefined_
 
 If the `NODE_ENV` environment variable is not set, the module doesn't load/parse any `NODE_ENV`-specific files at all.
-Therefore, you may want to use `"development"` as the default environment:
+Therefore, you may want to use `"development"` as a default environment, like:
 
 ```js
 require('dotenv-flow').config({
@@ -314,7 +313,7 @@ require('dotenv-flow').config({
 });
 ```
 
-Just make a note that all the following initialization examples are also equivalent:
+To be clear, just make a note that all the following initialization examples are also equivalent:
 
 ```js
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
@@ -335,11 +334,12 @@ require('dotenv-flow').config({
 });
 ```
 
-All the examples above, considers the value of `process.env.NODE_ENV` at first, and if not set, uses `"development"` as the value by default. You can just choose one that looks prettier for you.
+All the examples above, considers the value of `process.env.NODE_ENV` at first, and if it is not set, uses `"development"` as the value by default.
+You can just choose one that looks prettier for you.
 
 ##### `options.path`
-
 ###### Type: `string`
+###### Default: `process.cwd()` _(current working directory)_
 
 With the `path` initialization option you can specify a path to `.env*` files directory:
 
@@ -352,10 +352,10 @@ require('dotenv-flow').config({
 If the option is not provided, the current working directory is used.
 
 ##### `options.encoding`
-
 ###### Type: `string`
+###### Default: `"utf8"`
 
-You can specify the encoding of your files containing environment variables. The default value is `'utf8'`.
+You can specify the encoding for reading your files containing environment variables.
 
 ```js
 require('dotenv-flow').config({
@@ -364,15 +364,15 @@ require('dotenv-flow').config({
 ```
 
 ##### `options.purge_dotenv`
-
-###### Type: `Boolean`
+###### Type: `boolean`
+###### Default: `false`
 
 In some cases the original "dotenv" library can be used by one of the dependent
 npm modules. It causes calling the original `dotenv.config()` that loads
 the `.env` file from your project before you can call `dotenv-flow.config()`.
 
 Such cases breaks `.env*` files priority because the previously loaded
-environment variables are treated as shell-defined thus having the higher priority.
+environment variables are treated as shell-defined thus having a higher priority.
 
 Setting the `purge_dotenv` option to `true` can gracefully fix this issue.
 
@@ -397,14 +397,13 @@ Also, make a note that the `.env.local` file is not included when the value of `
 ##### Parameters:
 
 ##### `dirname`
-
 ###### Type: `string`
 
 A path to `.env*` files' directory.
 
 ##### `[options.node_env]`
-
 ###### Type: `string`
+###### Default: _undefined_
 
 The node environment (development/test/production/etc,).
 
@@ -441,14 +440,13 @@ When several filenames are given, the parsed variables are merged into a single 
 ##### Parameters:
 
 ##### `filenames`
-
 ###### Type: `string|string[]`
 
 A filename or a list of filenames to parse.
 
 ##### `[options.encoding]`
-
 ###### Type: `string`
+###### Default: `"utf8"`
 
 An optional encoding for reading files.
 
@@ -491,22 +489,20 @@ console.log(typeof variables, variables); // > object { FOO: 'bar', BAZ: 'qux' }
 
 Loads variables defined in a given file(s) into `process.env`.
 
-When several filenames are given, the parsed variables are merged using the "overwrite" strategy.
-
-Merging the parsed environment variables into `process.env` is done using the "append" strategy, thus giving the higher priority to the environment variables that are predefined by the shell.
+When several filenames are given, parsed environment variables are merged using the "overwrite" strategy since it utilizes [`.parse()`](#parsefilenames-options--object) for doing this.
+But eventually, assigning the parsed environment variables to `process.env` is done using the "append" strategy, thus giving a higher priority to the environment variables predefined by the shell.
 
 
 ##### Parameters:
 
 ##### `filenames`
-
 ###### Type: `string|string[]`
 
 A filename or a list of filenames to load.
 
 ##### `[options.encoding]`
-
 ###### Type: `string`
+###### Default: `"utf8"`
 
 An optional encoding for reading files.
 
@@ -560,14 +556,13 @@ The environment variables that are predefined (i.e. by the shell) will not be un
 ##### Parameters:
 
 ##### `filenames`
-
 ###### Type: `string|string[]`
 
 A filename or a list of filenames to unload.
 
 ##### `[options.encoding]`
-
 ###### Type: `string`
+###### Default: `"utf8"`
 
 An optional encoding for reading files.
 
