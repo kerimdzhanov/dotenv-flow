@@ -35,6 +35,9 @@
     "sinon-chai": "^3.3.0",
     "tmp": "^0.1.0"
   },
+  "engines": {
+    "node": ">= 8.0.0"
+  },
   "scripts": {
     "test": "mocha -r mocha.conf.js test/{unit,integration}/*.spec.js",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
