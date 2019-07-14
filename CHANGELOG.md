@@ -1,4 +1,4 @@
-# [3.0.0-rc.1](https://github.com/kerimdzhanov/dotenv-flow/compare/v2.0.0...v3.0.0-rc.1) (2019-06-30)
+# [3.0.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v2.0.0...v3.0.0) (2019-07-14)
 
 
 ### Features
