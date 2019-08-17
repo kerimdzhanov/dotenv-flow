@@ -253,6 +253,13 @@ describe('dotenv-flow (API)', () => {
           .to.have.been.calledWithMatch(/^dotenv-flow: .*%s.+/, 'ENV_VAR');
       });
 
+      it('suppresses the console output when the `silent` option is given', () => {
+        dotenvFlow.load('/path/to/project/.env', { silent: true });
+
+        expect(console.warn)
+          .to.have.not.been.called;
+      });
+
       it('returns the parsed content of the file in the `parsed` property', () => {
         const result = dotenvFlow.load('/path/to/project/.env');
 
@@ -672,6 +679,29 @@ describe('dotenv-flow (API)', () => {
       });
     });
 
+    describe('when the `silent` option is given', () => {
+      beforeEach('stub `console.warn`', () => {
+        sinon.stub(console, 'warn');
+      });
+
+      afterEach('restore `console.warn`', () => {
+        console.warn.restore();
+      });
+
+      it('suppresses console outputs', () => {
+        process.env.DEFAULT_ENV_VAR = 'predefined';
+
+        $dotenvFiles['/path/to/project/.env'] = 'DEFAULT_ENV_VAR=ok';
+
+        dotenvFlow.config({
+          silent: true
+        });
+
+        expect(console.warn)
+          .to.have.not.been.called;
+      });
+    });
+
     describe('the return object', () => {
       it('includes the parsed contents of the files in the `parsed` property', () => {
         $dotenvFiles['/path/to/project/.env'] = 'DEFAULT_ENV_VAR=ok';
@@ -719,7 +749,6 @@ describe('dotenv-flow (API)', () => {
           .that.is.an('error')
           .with.property('message', 'file reading error stub');
       });
-    })
-
+    });
   });
 });

@@ -260,6 +260,7 @@ When preloading **dotenv-flow** using the node's `-r` switch you can use the fol
 * `DOTENV_FLOW_PATH` => [`options.path`](#optionspath);
 * `DOTENV_FLOW_ENCODING` => [`options.encoding`](#optionsencoding);
 * `DOTENV_FLOW_PURGE_DOTENV` => [`options.purge_dotenv`](#optionspurge_dotenv);
+* `DOTENV_FLOW_SILENT` => [`options.silent`](#optionssilent);
 
 ```sh
 $ NODE_ENV=production DOTENV_FLOW_PATH=/path/to/env-files-dir node -r dotenv-flow/config your_script.js
@@ -272,6 +273,7 @@ $ NODE_ENV=production DOTENV_FLOW_PATH=/path/to/env-files-dir node -r dotenv-flo
 * `--dotenv-flow-path` => [`options.path`](#optionspath);
 * `--dotenv-flow-encoding` => [`options.encoding`](#optionsencoding);
 * `--dotenv-flow-purge-dotenv` => [`options.purge_dotenv`](#optionspurge_dotenv);
+* `--dotenv-flow-silent` => [`options.silent`](#optionssilent);
 
 Don't forget to separate **dotenv-flow/config**-specific CLI switches with `--` because they're unrecognized by **Node.js**:
 
@@ -379,6 +381,18 @@ Setting the `purge_dotenv` option to `true` can gracefully fix this issue.
 ```js
 require('dotenv-flow').config({
   purge_dotenv: true
+});
+```
+
+##### `options.silent`
+###### Type: `boolean`
+###### Default: `false`
+
+With this option you can suppress all the console outputs except errors and deprecation warnings.
+
+```js
+require('dotenv-flow').config({
+  silent: true
 });
 ```
 
@@ -506,6 +520,11 @@ A filename or a list of filenames to load.
 
 An optional encoding for reading files.
 
+##### `[options.silent]`
+###### Type: `boolean`
+###### Default: `false`
+
+Suppress all the console outputs except errors and deprecation warnings.
 
 ##### Returns:
 
