@@ -1,3 +1,12 @@
+# [3.1.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v3.0.0...v3.1.0) (2019-08-17)
+
+
+### Features
+
+* **dotenv-flow:** implement the "silence" mode, closes [#17](https://github.com/kerimdzhanov/dotenv-flow/issues/17) ([1177162](https://github.com/kerimdzhanov/dotenv-flow/commit/1177162))
+
+
+
 # [3.0.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v2.0.0...v3.0.0) (2019-07-14)
 
 
