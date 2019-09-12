@@ -31,6 +31,7 @@
     "chai": "^4.2.0",
     "conventional-changelog-cli": "^2.0.23",
     "jest": "^24.9.0",
+    "jest-cli": "^24.9.0",
     "mocha": "^6.2.0",
     "sinon": "^7.4.1",
     "sinon-chai": "^3.3.0",
@@ -41,6 +42,7 @@
   },
   "scripts": {
     "test": "mocha -r mocha.conf.js test/{unit,integration}/*.spec.js",
+    "test:jest": "jest ./test/unit/dotenv.flow.test.js",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
   },
   "author": "Dan Kerimdzhanov",
