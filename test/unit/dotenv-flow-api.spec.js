@@ -3,6 +3,8 @@
 const {expect} = require('chai');
 const sinon = require('sinon');
 const fs = require('fs');
+const {normalize} = require('path');
+const {isWindows, normalizePosixPath} = require('../integration/helpers/windows');
 
 const dotenvFlow = require('../../lib/dotenv-flow');
 
@@ -28,7 +30,8 @@ describe('dotenv-flow (API)', () => {
       let filenames;
 
       beforeEach('apply `.listDotenvFiles` without extra options', () => {
-        filenames = dotenvFlow.listDotenvFiles('/path/to/project');
+        filenames = dotenvFlow.listDotenvFiles('/path/to/project')
+          .map(p => normalizePosixPath(p));
       });
 
       it('lists the default `.env` file', () => {
@@ -54,7 +57,8 @@ describe('dotenv-flow (API)', () => {
       let filenames;
 
       beforeEach('apply `.listDotenvFiles` with the `node_env` option', () => {
-        filenames = dotenvFlow.listDotenvFiles('/path/to/project', { node_env: 'development' });
+        filenames = dotenvFlow.listDotenvFiles('/path/to/project', { node_env: 'development' })
+          .map(p => normalizePosixPath(p));
       });
 
       it('lists the default `.env` file', () => {
@@ -92,7 +96,8 @@ describe('dotenv-flow (API)', () => {
       let filenames;
 
       beforeEach('apply `.listDotenvFiles` with the `node_env` option value of "test"', () => {
-        filenames = dotenvFlow.listDotenvFiles('/path/to/project', { node_env: 'test' });
+        filenames = dotenvFlow.listDotenvFiles('/path/to/project', { node_env: 'test' })
+          .map(p => normalizePosixPath(p));
       });
 
       it("doesn't list the `.env.local` file", () => {
@@ -334,7 +339,7 @@ describe('dotenv-flow (API)', () => {
 
     beforeEach('stub `fs.existsSync`', () => {
       $existsSync = sinon.stub(fs, 'existsSync')
-        .callsFake(filename => $dotenvFiles.hasOwnProperty(filename));
+        .callsFake(filename => $dotenvFiles.hasOwnProperty(normalizePosixPath(filename)));
     });
 
     afterEach(() => $existsSync.restore());
@@ -344,11 +349,12 @@ describe('dotenv-flow (API)', () => {
     beforeEach('stub `fs.readFileSync`', () => {
       $readFileSync = sinon.stub(fs, 'readFileSync')
         .callsFake((filename) => {
-          if (!$dotenvFiles.hasOwnProperty(filename)) {
-            throw new Error(`file "${filename}" doesn't exist`);
+          const normalizedFilename = normalizePosixPath(filename);
+          if (!$dotenvFiles.hasOwnProperty(normalizedFilename)) {
+            throw new Error(`file "${normalizedFilename}" doesn't exist`);
           }
 
-          return $dotenvFiles[filename];
+          return $dotenvFiles[normalizedFilename];
         });
     });
 
@@ -395,8 +401,13 @@ describe('dotenv-flow (API)', () => {
 
         dotenvFlow.config();
 
-        expect($processCwd)
-          .to.have.been.calledOnce;
+        // path.resolve() calls process.cwd() internally on windows
+        // https://github.com/nodejs/node/blob/d0377a825bf7ceb838570f434fdd7d4b1773b8fa/lib/path.js#L146
+        // listDotenvFiles calls path.resolve() 2 times, so $processCwd.callCount === 3 on win (and 1 on posix)
+        if (!isWindows()) {
+          expect($processCwd)
+            .to.have.been.calledOnce;
+        }
 
         expect(process.env)
           .to.have.property('DEFAULT_ENV_VAR', 'ok');
@@ -615,8 +626,13 @@ describe('dotenv-flow (API)', () => {
           path: '/custom/working/directory'
         });
 
-        expect($processCwd)
-          .to.have.not.been.called;
+        // path.resolve() calls process.cwd() internally on windows
+        // https://github.com/nodejs/node/blob/d0377a825bf7ceb838570f434fdd7d4b1773b8fa/lib/path.js#L146
+        // listDotenvFiles calls path.resolve() 2 times, so $processCwd.callCount === 2 on win (and 0 on posix)
+        if (!isWindows()) {
+          expect($processCwd)
+            .to.have.not.been.called;
+        }
 
         expect(process.env)
           .to.have.property('DEFAULT_ENV_VAR', 'ok');
@@ -632,7 +648,7 @@ describe('dotenv-flow (API)', () => {
         });
 
         expect($readFileSync)
-          .to.have.been.calledWith('/path/to/project/.env', { encoding: 'base64' });
+          .to.have.been.calledWith(normalize('/path/to/project/.env'), { encoding: 'base64' });
       });
     });
 
@@ -671,10 +687,10 @@ describe('dotenv-flow (API)', () => {
           dotenvFlow.config(options);
 
           expect($readFileSync.firstCall)
-            .to.have.been.calledWith('/path/to/project/.env', { encoding: 'base64' });
+            .to.have.been.calledWith(normalize('/path/to/project/.env'), { encoding: 'base64' });
 
           expect($readFileSync.secondCall)
-            .to.have.been.calledWith('/path/to/project/.env', { encoding: 'base64' });
+            .to.have.been.calledWith(normalize('/path/to/project/.env'), { encoding: 'base64' });
         });
       });
     });
@@ -727,7 +743,7 @@ describe('dotenv-flow (API)', () => {
 
       beforeEach('stub `fs.readFileSync` error', () => {
         $readFileSync
-          .withArgs('/path/to/project/.env.local')
+          .withArgs(normalize('/path/to/project/.env.local'))
           .throws(new Error('file reading error stub'));
       });
 
