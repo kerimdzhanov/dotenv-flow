@@ -6,6 +6,7 @@ const util = require('util');
 const execFile = util.promisify(require('child_process').execFile);
 const writeFile = util.promisify(require('fs').writeFile);
 const {expect} = require('chai');
+const {itSkipOnWindows} = require('./helpers/windows');
 
 /**
  * Get the path to a given fixture project.
@@ -346,7 +347,7 @@ describe('dotenv-flow.config (entry point)', () => {
     });
 
     describe('if an error occurred while reading `*.env` files', () => {
-      it('includes the `error` property that is a reference to the occurred error object', (done) => {
+      itSkipOnWindows('includes the `error` property that is a reference to the occurred error object', (done) => {
         tmp.dir({ unsafeCleanup: true }, (err, directory) => {
           if (err) {
             return done(err);

@@ -27,7 +27,7 @@ async function execWithPreload(cwd, {env = {}, args = []} = {}) {
   const {stdout} = await execFile(
     process.argv[0], // ~= /usr/bin/node
     [
-      '-r', '../config',
+      '-r', path.join(__dirname, '../../config'),
       '-e', 'console.log(JSON.stringify(process.env));',
       '--', ...args
     ],
