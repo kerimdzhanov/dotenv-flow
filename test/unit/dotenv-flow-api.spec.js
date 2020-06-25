@@ -34,6 +34,11 @@ describe('dotenv-flow (API)', () => {
           .map(p => normalizePosixPath(p));
       });
 
+      it('lists the default `.env.defaults` file', () => {
+        expect(filenames)
+          .to.include('/path/to/project/.env.defaults');
+      });
+
       it('lists the default `.env` file', () => {
         expect(filenames)
           .to.include('/path/to/project/.env');
@@ -47,6 +52,7 @@ describe('dotenv-flow (API)', () => {
       it('lists `.env*` files in the "variables overwriting" order', () => {
         expect(filenames)
           .to.have.ordered.members([
+            "/path/to/project/.env.defaults",
             '/path/to/project/.env',
             '/path/to/project/.env.local'
           ]);
@@ -84,6 +90,7 @@ describe('dotenv-flow (API)', () => {
       it('lists `.env*` files in the "variables overwriting" order', () => {
         expect(filenames)
           .to.have.ordered.members([
+            '/path/to/project/.env.defaults',
             '/path/to/project/.env',
             '/path/to/project/.env.local',
             '/path/to/project/.env.development',
@@ -403,7 +410,7 @@ describe('dotenv-flow (API)', () => {
 
         // path.resolve() calls process.cwd() internally on windows
         // https://github.com/nodejs/node/blob/d0377a825bf7ceb838570f434fdd7d4b1773b8fa/lib/path.js#L146
-        // listDotenvFiles calls path.resolve() 2 times, so $processCwd.callCount === 3 on win (and 1 on posix)
+        // listDotenvFiles calls path.resolve() 3 times, so $processCwd.callCount === 4 on win (and 1 on posix)
         if (!isWindows()) {
           expect($processCwd)
             .to.have.been.calledOnce;
@@ -628,7 +635,7 @@ describe('dotenv-flow (API)', () => {
 
         // path.resolve() calls process.cwd() internally on windows
         // https://github.com/nodejs/node/blob/d0377a825bf7ceb838570f434fdd7d4b1773b8fa/lib/path.js#L146
-        // listDotenvFiles calls path.resolve() 2 times, so $processCwd.callCount === 2 on win (and 0 on posix)
+        // listDotenvFiles calls path.resolve() 3 times, so $processCwd.callCount === 3 on win (and 0 on posix)
         if (!isWindows()) {
           expect($processCwd)
             .to.have.not.been.called;
