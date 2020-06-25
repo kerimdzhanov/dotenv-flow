@@ -24,6 +24,7 @@
     "lib/cli-options.js",
     "config.js"
   ],
+  "types": "types/index.d.ts",
   "dependencies": {
     "dotenv": "^8.0.0"
   },
