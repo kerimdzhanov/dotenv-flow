@@ -249,6 +249,18 @@ Since multiple `.env*` files are loaded together at the same time, all the varia
 5) if any variables are already defined in the environment before reading from `.env*`, they will not be overwritten, thus having the higher priority over defined in any env file;
 
 
+## Alternative defaults: `.env.defaults` 
+
+In addition to `.env`, you may also use `.env.defaults` to store default (fallback) values.
+
+This may come handy e.g. when migrating from [dotenv](https://github.com/motdotla/dotenv) (where it is strongly advised against committing `.env` file to VCS)
+and you already have `.env` file used to store your local values.
+
+In such case, you may prefer to keep using your existing `.env` (**ignored** by VCS) as your local config
+and create additional `.env.defaults` (**tracked** by VCS) file which will be loaded before `.env`. 
+
+Then at every place `.env` is mentioned in the docs, read it as: "`.env.defaults` first, then `.env`".
+
 ## `dotenv-flow/config` options
 
 When preloading **dotenv-flow** using the node's `-r` switch you can use the following configuration options:
