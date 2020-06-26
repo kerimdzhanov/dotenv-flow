@@ -5,9 +5,9 @@ import { readFileSync } from 'fs';
 
 export type ReadFileSyncOptions = Parameters<typeof readFileSync>[1];
 
-export type DotenvFlowFilenames = string | Buffer | Array<string | Buffer>;
+export type DotenvFilenames = string | Buffer | Array<string | Buffer>;
 
-export interface DotenvFlowParseOutput {
+export interface DotenvParseOutput {
   [name: string]: string;
 }
 
@@ -17,11 +17,11 @@ export interface DotenvFlowParseOutput {
  * When several filenames are given, the parsed environment variables are merged using the "overwrite" strategy.
  */
 export function parse(
-  filenames: DotenvFlowFilenames,
+  filenames: DotenvFilenames,
   options?: ReadFileSyncOptions
-): DotenvFlowParseOutput;
+): DotenvParseOutput;
 
-export interface DotenvFlowConfigOptions {
+export interface DotenvConfigOptions {
   /**
    * Node environment (development/test/production/etc,.)
    *
@@ -63,19 +63,19 @@ export interface DotenvFlowConfigOptions {
   silent?: boolean;
 }
 
-export interface DotenvFlowConfigOutput {
+export interface DotenvConfigOutput {
   error?: Error;
-  parsed?: DotenvFlowParseOutput;
+  parsed?: DotenvParseOutput;
 }
 
 /**
  * Loads and parses the contents of your .env* files, merges the results and appends to process.env.*.
  */
 export function config(
-  options?: DotenvFlowConfigOptions
-): DotenvFlowConfigOutput;
+  options?: DotenvConfigOptions
+): DotenvConfigOutput;
 
-export interface DotenvFlowListDotenvFilesOptions {
+export interface DotenvListDotenvFilesOptions {
   /**
    * Node environment (development/test/production/etc,.)
    */
@@ -90,10 +90,10 @@ export interface DotenvFlowListDotenvFilesOptions {
  */
 export function listDotenvFiles(
   dirname: string,
-  options?: DotenvFlowListDotenvFilesOptions
+  options?: DotenvListDotenvFilesOptions
 ): string[];
 
-export interface DotenvFlowLoadOptions {
+export interface DotenvLoadOptions {
   /**
    * Encoding of `.env*` files
    */
@@ -107,7 +107,7 @@ export interface DotenvFlowLoadOptions {
   silent?: boolean;
 }
 
-export type DotenvFlowLoadOutput = DotenvFlowConfigOutput;
+export type DotenvLoadOutput = DotenvConfigOutput;
 
 /**
  * Load variables defined in a given file(s) into `process.env`.
@@ -117,11 +117,11 @@ export type DotenvFlowLoadOutput = DotenvFlowConfigOutput;
  * thus giving a higher priority to the environment variables predefined by the shell.
  */
 export function load(
-  filenames: DotenvFlowFilenames,
-  options?: DotenvFlowLoadOptions
-): DotenvFlowLoadOutput;
+  filenames: DotenvFilenames,
+  options?: DotenvLoadOptions
+): DotenvLoadOutput;
 
 export function unload(
-  filenames: DotenvFlowFilenames,
+  filenames: DotenvFilenames,
   options?: ReadFileSyncOptions
 ): void;
