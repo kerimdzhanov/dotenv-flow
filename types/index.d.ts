@@ -121,6 +121,17 @@ export function load(
   options?: DotenvLoadOptions
 ): DotenvLoadOutput;
 
+/**
+ * Unload variables defined in a given file(s) from `process.env`.
+ *
+ * This function can gracefully resolve the following issue:
+ *
+ * In some cases the original "dotenv" library can be used by one of the dependent npm modules.
+ * It causes calling the original `dotenv.config()` that loads the `.env` file from your project before you can call `dotenv-flow.config()`.
+ * Such cases breaks `.env*` files priority because the previously loaded environment variables are treated as shell-defined thus having a higher priority.
+ *
+ * Unloading the previously loaded `.env` file can be activated when using the `dotenv-flow.config()` with the `purge_dotenv` option set to `true`.
+ */
 export function unload(
   filenames: DotenvFilenames,
   options?: ReadFileSyncOptions
