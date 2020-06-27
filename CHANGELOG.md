@@ -1,3 +1,12 @@
+# [3.2.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v3.1.0...v3.2.0) (2020-06-27)
+
+
+### Features
+
+* **dotenv-flow:** alternative defaults: `.env.defaults` ([#29](https://github.com/kerimdzhanov/dotenv-flow/issues/29)) ([4d2124c](https://github.com/kerimdzhanov/dotenv-flow/commit/4d2124c))
+
+
+
 # [3.1.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v3.0.0...v3.1.0) (2019-08-17)
 
 
