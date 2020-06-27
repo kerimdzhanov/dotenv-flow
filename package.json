@@ -29,8 +29,8 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "conventional-changelog-cli": "^2.0.34",
-    "mocha": "^8.0.1",
+    "conventional-changelog-cli": "^2.0.23",
+    "mocha": "7.2.0",
     "sinon": "^9.0.2",
     "sinon-chai": "^3.5.0",
     "tmp": "^0.2.1"
