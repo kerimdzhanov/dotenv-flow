@@ -635,6 +635,14 @@ console.log(process.env.BAZ); // > 'Yay!'
 ---
 
 
+## Related packages
+
+* [`@types/dotenv-flow`](https://www.npmjs.com/package/@types/dotenv-flow) – type definitions for using `dotenv-flow` with TypeScript
+* [`dotenv-flow-webpack`](https://github.com/kerimdzhanov/dotenv-flow-webpack) – a webpack plugin for using `dotenv-flow` in web applications
+* [`dotenv-flow-cli`](https://github.com/ovos/dotenv-flow-cli) – CLI executable that preloads environment variables using `dotenv-flow`
+* [`dotenv-expand`](https://github.com/motdotla/dotenv-expand) – environment variables expansion _(originally designed for `dotenv`, but also compatible with `dotenv-flow`)_
+
+
 ## Contributing
 
 Feel free to dive in! [Open an issue](https://github.com/kerimdzhanov/dotenv-flow/issues/new) or submit PRs.
