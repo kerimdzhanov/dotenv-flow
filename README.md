@@ -38,13 +38,9 @@ As early as possible in your application, require and configure **dotenv-flow**.
 require('dotenv-flow').config();
 ```
 
-This will read environment variables from the `.env` file allowing them to be overwritten locally in the `.env.local` file.
+After this, you can access all the environment variables you have defined in your `.env*` files through `process.env.*`.
 
-When running, your `process.env` will have keys and values you've defined in your `.env*` files.
-
-Additionally, if the `NODE_ENV` environment variable is set, then `.env.${NODE_ENV}` and the appropriate `.env.${NODE_ENV}.local` files are also be loaded.
-
-For example, let's suppose that you have the following `.env.*` files in your project:
+For example, let's suppose that you have the following `.env*` files in your project:
 
 ```sh
 # .env
@@ -135,7 +131,7 @@ database pass: 1qa2ws3ed4rf5tg6yh
 database name: application_storage
 ```
 
-And as you may already understood, the `.env*.local` files should be ignored by your version control system (refer the [Files under version control](#files-under-version-control) section below to learn more), and you'll have the `.env.production.local` file only on your production deployment machine.
+Note that the `.env*.local` files should be ignored by your version control system (refer the [Files under version control](#files-under-version-control) section below to learn more), and you should have the `.env.production.local` file only on your production deployment machine.
 
 
 ### `NODE_ENV`-specific env files
