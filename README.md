@@ -42,7 +42,7 @@ This will read environment variables from the `.env` file allowing them to be ov
 
 When running, your `process.env` will have keys and values you've defined in your `.env*` files.
 
-Additionally, if the `NODE_ENV` environment variable is set, then`.env.${NODE_ENV}` and the appropriate `.env.${NODE_ENV}.local` files are also be loaded.
+Additionally, if the `NODE_ENV` environment variable is set, then `.env.${NODE_ENV}` and the appropriate `.env.${NODE_ENV}.local` files are also be loaded.
 
 For example, let's suppose that you have the following `.env.*` files in your project:
 
@@ -59,7 +59,7 @@ DATABASE_NAME=my_app
 ```sh
 # .env.local
 
-DATABASE_USER=hacker
+DATABASE_USER=local-user
 DATABASE_PASS=super-secret
 ```
 
@@ -103,23 +103,23 @@ console.log('database pass:', process.env.DATABASE_PASS);
 console.log('database name:', process.env.DATABASE_NAME);
 ```
 
-And if you run `your_script.js` in **development** environment, like this:
+And if you run `your_script.js` in the **development** environment, like:
 
 ```sh
 $ NODE_ENV=development node your_scrips.js
 ```
 
-then you'll get the following output:
+you'll get the following output:
 
 ```text
 database host: 127.0.0.1
 database port: 27017
-database user: hacker
+database user: local-user
 database pass: super-secret
 database name: my_app_dev
 ```
 
-Or if you run the same script in **production** environment:
+Or if you run the same script in the **production** environment:
 
 ```sh
 $ NODE_ENV=production node your_script.js
@@ -140,8 +140,8 @@ And as you may already understood, the `.env*.local` files should be ignored by 
 
 ### `NODE_ENV`-specific env files
 
-Actually **dotenv-flow** have no any "predefined" environments, so you may have whatever environment names you want,
-but it's a good practice to use world's universally recognized environment names like `development`, `test`, `production`, and also frequently used `qa` or `stage`.
+Actually, **dotenv-flow** doesn't have any predefined environment names, so you may use whatever names you want.
+However, it's a good practice to use the world's universally recognized environment names like `development`, `test`, `production`, as well as frequently used `qa` or `stage`.
 
 The naming convention for `NODE_ENV`-specific files is simply as `.env.${NODE_ENV}[.local]` (i.e. `.env.development`, `.env.test`, `.env.production`, `.env.development.local`, `.env.production.local`, etc.).
 
@@ -171,7 +171,7 @@ Or even better, use [cross-env](https://github.com/kentcdodds/cross-env) to make
 $ cross-env NODE_ENV=production node your_script.js
 ```
 
-`--node-env` switch is also supported:
+The `--node-env` switch is also supported:
 
 ```sh
 $ node your_script.js --node-env=production
@@ -203,18 +203,18 @@ Refer to the [`dotenv-flow/config` options](#dotenv-flowconfig-options) section 
 
 ## Files under version control
 
-The general thing here – is not to commit production database passwords, API keys and other sensitive things to your source code repository,
-but it's still ok to keep default database connections, ports, hosts, etc., like `localhost:3000` and so on as a fallback to keep your code clean, simple and always "just work".
+The main point here is not to commit production database passwords, API keys and other sensitive things to your source code repository,
+but it's still nice to have default database connections, ports, hosts, etc., for development and testing purposes to keep your code clean and simple.
 
 Understanding the above, we have the following approach:
 
-You can keep all the fallback values in the default `.env` file, that (if exists) will always be loaded independently from any environment.
-And also it is a good place to have all the application used environment variables here, thus having a reference of environment variables that are used by your application on the whole.
-So it's a good reason to share the `.env` file with other developers in your team, but keep all the sensitive data on your own (or production) machine locally in the `.env.local` file.
+You can keep all the fallback values in the default `.env` file, that (if exists) will always be loaded by default.
+Also, it is a good place to have all the application used environment variables there, thus having a reference of environment variables that are used by your application on the whole.
+So it is a good reason to share the `.env` file with other developers in your team, but keep all the sensitive data on your own (or production) machine locally in the `.env*.local` files.
 
 It is not necessary, but also a good practice to use `NODE_ENV` to control the environment to run your application in.
-And if you follow this practice you can keep the `NODE_ENV`-specific defaults in your `.env.development`, `.env.test`, `.env.production` files and share them with your team.
-Any `NODE_ENV`-specific `.env.*` file's values can also be overwritten in the appropriate `.env.*.local` (i.e. `.env.development.local`, `.env.test.local`, `.env.production.local`).
+And if you follow this practice you can keep the `NODE_ENV`-specific defaults in your `.env.development`, `.env.test`, `.env.production` files sharing them with your team as well.
+Any `NODE_ENV`-specific `.env.*` file's values can also be overwritten in the appropriate `.env.*.local` file (i.e. `.env.development.local`, `.env.test.local`, `.env.production.local`).
 
 Summarizing the above, you can have the following `.env*` files in your project:
 
@@ -227,9 +227,9 @@ Summarizing the above, you can have the following `.env*` files in your project:
  * `.env.test.local` – for individual test environment values, **ignored** by VCS
  * `.env.production.local` – for production environment values (DB passwords, API keys, etc.), **ignored** by VCS
 
-Make a note that `.env.*` file names may vary in your project depending on your own needs/preferences, just keep in mind that `.env*.local` files should be untracked (ignored) by your version control system.
+Note that `.env.*` file names may vary in your project depending on your own needs/preferences, just keep in mind that `.env*.local` files should be untracked (ignored) by your version control system.
 
-Here is an example of the `.gitignore` (or `.hgignore`) file entry to keep it clean:
+Here is an example of the `.gitignore` (or `.hgignore`) file entry to keep it clear:
 
 ```gitignore
 # local .env* files
@@ -240,13 +240,13 @@ Here is an example of the `.gitignore` (or `.hgignore`) file entry to keep it cl
 
 ## Variables overwriting/priority
 
-Since multiple `.env*` files are loaded together at the same time, all the variables defined there are merged in the following order:
+Since multiple `.env*` files are loaded simultaneously, all the variables defined in these files are merged in the following order:
 
-1) `.env` file have a lowest priority over all, keep the most default (fallback) values here;
-2) `.env.local` file have a priority over the `.env`, create it if you want to overwrite the default values for your own environment-specific needs;
-3) `NODE_ENV`-specific env files (`.env.development`, `.env.test`, etc.) have a priority over the default `.env` and `.env.local` files, keep default `NODE_ENV`-specific environment variables here;
-4) `NODE_ENV`-specific local env files (`.env.development.local`, `.env.production.local`, etc.) have a highest priority, as with `.env.local`, create them only if you need to overwrite `NODE_ENV`-specific default values for your individual needs;
-5) if any variables are already defined in the environment before reading from `.env*`, they will not be overwritten, thus having the higher priority over defined in any env file;
+1) The `.env` file has the lowest priority. _Keep the most default (fallback) values there_;
+2) The `.env.local` file has a priority over the `.env`. _Create it if you want to overwrite the default values for your own environment-specific needs_;
+3) `NODE_ENV`-specific env files (like `.env.development`, `.env.test`, etc.) have a priority over the default `.env` and `.env.local` files. _Keep `NODE_ENV`-specific environment variables there_;
+4) `NODE_ENV`-specific local env files (`.env.development.local`, `.env.production.local`, etc.) have the highest priority over all the env files. _As with `.env.local`, create them only if you need to overwrite `NODE_ENV`-specific values for your own environment-specific needs_;
+5) Environment variables that are already set will not be overwritten, that means that the command line variables have a higher priority over all those defined in env files;
 
 
 ## Alternative defaults: `.env.defaults` 
@@ -260,6 +260,7 @@ In such case, you may prefer to keep using your existing `.env` (**ignored** by 
 and create additional `.env.defaults` (**tracked** by VCS) file which will be loaded before `.env`. 
 
 Then at every place `.env` is mentioned in the docs, read it as: "`.env.defaults` first, then `.env`".
+
 
 ## `dotenv-flow/config` options
 
@@ -287,7 +288,7 @@ $ NODE_ENV=production DOTENV_FLOW_PATH=/path/to/env-files-dir node -r dotenv-flo
 * `--dotenv-flow-purge-dotenv` => [`options.purge_dotenv`](#optionspurge_dotenv);
 * `--dotenv-flow-silent` => [`options.silent`](#optionssilent);
 
-Don't forget to separate **dotenv-flow/config**-specific CLI switches with `--` because they're unrecognized by **Node.js**:
+Don't forget to separate **dotenv-flow/config**-specific CLI switches with `--` because they are not recognized by **Node.js**:
 
 ```sh
 $ node -r dotenv-flow/config your_script.js -- --dotenv-flow-encoding=latin1 --dotenv-flow-path=...
@@ -410,14 +411,14 @@ require('dotenv-flow').config({
 
 ---
 
-The following API is considered as internal, but it is also exposed to give the ability to be used programmatically by your own needs.
+The following API considered as internal, but it is also exposed to give the ability to be used programmatically by your own needs.
 
 
 #### `.listDotenvFiles(dirname, [options]) => string[]`
 
 Returns a list of `.env*` filenames depending on the given `options.node_env`. The resulting list is ordered by the env files priority from lowest to highest.
 
-Also, make a note that the `.env.local` file is not included when the value of `node_env` is "test"`, since normally you expect tests to produce the same results for everyone.
+Also, note that the `.env.local` file will not be listed for `NODE_ENV="test"`, since normally you expect tests to produce the same results for everyone.
 
 
 ##### Parameters:
@@ -660,4 +661,4 @@ $ yarn test
 
 ## License
 
-Licensed under [MIT](LICENSE) © 2018-2019 Dan Kerimdzhanov
+Licensed under [MIT](LICENSE) © 2018-2020 Dan Kerimdzhanov
