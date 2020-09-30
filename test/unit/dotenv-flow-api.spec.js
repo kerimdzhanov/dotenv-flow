@@ -695,7 +695,7 @@ describe('dotenv-flow (API)', () => {
         });
 
         expect($readFileSync)
-          .to.have.been.calledWith(normalize('/path/to/project/.env'), { encoding: 'base64' });
+          .to.have.been.calledWith(normalize('/path/to/project/.env'), { encoding: 'base64', schema: 'properties' });
       });
     });
 
@@ -737,7 +737,7 @@ describe('dotenv-flow (API)', () => {
             .to.have.been.calledWith(normalize('/path/to/project/.env'), { encoding: 'base64' });
 
           expect($readFileSync.secondCall)
-            .to.have.been.calledWith(normalize('/path/to/project/.env'), { encoding: 'base64' });
+            .to.have.been.calledWith(normalize('/path/to/project/.env'), { encoding: 'base64', schema: 'properties'  });
         });
       });
     });
