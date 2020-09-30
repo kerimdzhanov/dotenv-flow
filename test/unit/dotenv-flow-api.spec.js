@@ -272,6 +272,46 @@ describe('dotenv-flow (API)', () => {
           .to.have.not.been.called;
       });
 
+      it('testing yaml as schema for *.env file', () => {
+        $readFileSync
+          .withArgs('/path/to/project/.env')
+          .returns(
+            'foo: bar\n'+
+            'foos: ["bar1", "bar2"]\n' +
+            'foos2:\n' +
+            '  - bar3\n'+
+            '  - bar4\n'
+          );
+        const result = dotenvFlow.load('/path/to/project/.env', { schema: 'yaml' });
+        expect(result)
+          .to.be.an('object')
+          .with.property('parsed')
+          .that.deep.equals({
+          foo: 'bar',
+          foos: ['bar1', 'bar2'],
+          foos2: ['bar3', 'bar4']
+        });
+      });
+
+      it('testing json as schema for *.env file', () => {
+        const json = {
+          foo: 'bar',
+          foos: ['bar1', 'bar2'],
+          foos2: ['bar3', 'bar4']
+        };
+        $readFileSync
+          .withArgs('/path/to/project/.env')
+          .returns(
+            JSON.stringify(json)
+          );
+        const result = dotenvFlow.load('/path/to/project/.env', { schema: 'json' });
+
+        expect(result)
+          .to.be.an('object')
+          .with.property('parsed')
+          .that.deep.equals(json);
+      });
+
       it('returns the parsed content of the file in the `parsed` property', () => {
         const result = dotenvFlow.load('/path/to/project/.env');
 

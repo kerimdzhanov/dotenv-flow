@@ -271,6 +271,7 @@ When preloading **dotenv-flow** using the node's `-r` switch you can use the fol
 * `DOTENV_FLOW_ENCODING` => [`options.encoding`](#optionsencoding);
 * `DOTENV_FLOW_PURGE_DOTENV` => [`options.purge_dotenv`](#optionspurge_dotenv);
 * `DOTENV_FLOW_SILENT` => [`options.silent`](#optionssilent);
+* `DOTENV_FLOW_SCHEMA` => [`options.schema`](#optionsschema);
 
 ```sh
 $ NODE_ENV=production DOTENV_FLOW_PATH=/path/to/env-files-dir node -r dotenv-flow/config your_script.js
@@ -284,6 +285,7 @@ $ NODE_ENV=production DOTENV_FLOW_PATH=/path/to/env-files-dir node -r dotenv-flo
 * `--dotenv-flow-encoding` => [`options.encoding`](#optionsencoding);
 * `--dotenv-flow-purge-dotenv` => [`options.purge_dotenv`](#optionspurge_dotenv);
 * `--dotenv-flow-silent` => [`options.silent`](#optionssilent);
+* `--dotenv-flow-schema` => [`options.schema`](#optionsschema);
 
 Don't forget to separate **dotenv-flow/config**-specific CLI switches with `--` because they are not recognized by **Node.js**:
 
@@ -406,6 +408,17 @@ require('dotenv-flow').config({
 });
 ```
 
+##### `options.schema`
+###### Type: `string`
+###### Default: `properties`
+
+With this option you can specify the schema of your *.env files (properties, json, yaml). 
+
+```js
+require('dotenv-flow').config({
+  schema: 'json'
+});
+```
 ---
 
 The following API considered as internal, but it is also exposed to give the ability to be used programmatically by your own needs.
@@ -535,6 +548,12 @@ An optional encoding for reading files.
 ###### Default: `false`
 
 Suppress all the console outputs except errors and deprecation warnings.
+
+##### `[options.schema]`
+###### Type: `string`
+###### Default: `properties`
+
+With this option you can specify the schema of your *.env files (properties, json, yaml). 
 
 ##### Returns:
 
