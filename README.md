@@ -103,7 +103,7 @@ console.log('database name:', process.env.DATABASE_NAME);
 And if you run `your_script.js` in the **development** environment, like:
 
 ```sh
-$ NODE_ENV=development node your_scrips.js
+$ NODE_ENV=development node your_script.js
 ```
 
 you'll get the following output:
