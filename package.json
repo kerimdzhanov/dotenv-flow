@@ -19,6 +19,11 @@
     "url": "https://github.com/kerimdzhanov/dotenv-flow/issues"
   },
   "main": "lib/dotenv-flow.js",
+  "exports": {
+    ".": "./lib/dotenv-flow.js",
+    "./config": "./config.js",
+    "./package.json": "./package.json"
+  },
   "files": [
     "lib/env-options.js",
     "lib/cli-options.js",
