@@ -19,6 +19,11 @@
     "url": "https://github.com/kerimdzhanov/dotenv-flow/issues"
   },
   "main": "lib/dotenv-flow.js",
+  "exports": {
+    ".": "./lib/dotenv-flow.js",
+    "./config": "./config.js",
+    "./package.json": "./package.json"
+  },
   "files": [
     "lib/env-options.js",
     "lib/cli-options.js",
@@ -28,7 +33,7 @@
     "dotenv": "^8.2.0"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
+    "chai": "^4.3.7",
     "conventional-changelog-cli": "^2.0.23",
     "mocha": "7.2.0",
     "sinon": "^9.0.2",
@@ -39,7 +44,7 @@
     "node": ">= 8.0.0"
   },
   "scripts": {
-    "test": "mocha -r mocha.conf.js test/{unit,integration}/*.spec.js",
+    "test": "mocha -r mocha.conf.js test/{unit,integration}/*.spec.{m,}js",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
   },
   "author": "Dan Kerimdzhanov",
