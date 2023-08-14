@@ -33,13 +33,20 @@ $ yarn add dotenv-flow
 
 ## Usage
 
-As early as possible in your application, require and configure **dotenv-flow**.
+As early as possible in your application, require/import and initialize **dotenv-flow**:
 
 ```js
 require('dotenv-flow').config();
 ```
 
-After this, you can access all the environment variables you have defined in your `.env*` files through `process.env.*`.
+or, if you're using TypeScript:
+
+```ts
+import * as dotenvFlow from 'dotenv-flow';
+dotenvFlow.config();
+```
+
+The `.config()` initialization function will load the environment-specific `.env*` files from the root directory of your project and assign `process.env.<ENV_VAR_NAME>`s in the appropriate order and priority.
 
 For example, let's suppose that you have the following `.env*` files in your project:
 
