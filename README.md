@@ -240,7 +240,7 @@ Here is an example of the `.gitignore` (or `.hgignore`) file entry to keep it cl
 Since multiple `.env*` files are loaded simultaneously, all the variables defined in these files are merged in the following order:
 
 1) The `.env` file has the lowest priority. _Keep the most default (fallback) values there_;
-2) The `.env.local` file has a priority over the `.env`. _Create it if you want to overwrite the default values for your own environment-specific needs_;
+2) The `.env.local` file has a priority over the `.env` (except when `NODE_ENV=test`, in which case this file is not loaded). _Create it if you want to overwrite the default values for your own environment-specific needs_;
 3) `NODE_ENV`-specific env files (like `.env.development`, `.env.test`, etc.) have a priority over the default `.env` and `.env.local` files. _Keep `NODE_ENV`-specific environment variables there_;
 4) `NODE_ENV`-specific local env files (`.env.development.local`, `.env.production.local`, etc.) have the highest priority over all the env files. _As with `.env.local`, create them only if you need to overwrite `NODE_ENV`-specific values for your own environment-specific needs_;
 5) Environment variables that are already set will not be overwritten, that means that the command line variables have a higher priority over all those defined in env files;
