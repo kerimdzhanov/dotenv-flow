@@ -34,10 +34,10 @@
   },
   "devDependencies": {
     "chai": "^4.3.7",
-    "conventional-changelog-cli": "^2.0.23",
-    "mocha": "7.2.0",
-    "sinon": "^9.0.2",
-    "sinon-chai": "^3.5.0",
+    "conventional-changelog-cli": "^2.0.35",
+    "mocha": "^10.2.0",
+    "sinon": "^15.2.0",
+    "sinon-chai": "^3.7.0",
     "tmp": "^0.2.1"
   },
   "engines": {
