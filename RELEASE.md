@@ -8,4 +8,4 @@
 4. Make a release commit with a message in format of `chore(release): vX.Y.Z`
 5. Tag the release commit using `$ git tag vX.Y.X`
 6. Push the release commit (including the tag) to GitHub `$ git push && git push --tags`
-7. Publish the new package version using `$ npm publish`
+7. Publish the new package version using `$ yarn publish [--tag=next]`
