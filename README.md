@@ -407,7 +407,7 @@ require('dotenv-flow').config({
 The following API considered as internal, but it is also exposed to give the ability to be used programmatically by your own needs.
 
 
-#### `.listDotenvFiles(dirname, [options]) => string[]`
+#### `.listFiles(dirname, [options]) => string[]`
 
 Returns a list of `.env*` filenames depending on the given `options.node_env`. The resulting list is ordered by the env files priority from lowest to highest.
 
@@ -440,10 +440,11 @@ A list of `.env*` filenames.
 ```js
 const dotenvFlow = require('dotenv-flow');
 
-const filenames = dotenvFlow.listDotenvFiles('/path/to/project', { node_env: 'development' });
+const filenames = dotenvFlow.listFiles('/path/to/project', { node_env: 'development' });
 
 console.log(filenames); // will output the following:
-// > [ '/path/to/project/.env',
+// > [ '/path/to/project/.env.defaults',
+// >   '/path/to/project/.env',
 // >   '/path/to/project/.env.local',
 // >   '/path/to/project/.env.development',
 // >   '/path/to/project/.env.development.local' ]

@@ -25,12 +25,12 @@ function isolateProcessEnv() {
 }
 
 describe('dotenv-flow (API)', () => {
-  describe('.listDotenvFiles', () => {
+  describe('.listFiles', () => {
     describe('by default (when no options are given)', () => {
       let filenames;
 
-      beforeEach('apply `.listDotenvFiles` without extra options', () => {
-        filenames = dotenvFlow.listDotenvFiles('/path/to/project')
+      beforeEach('apply `.listFiles` without extra options', () => {
+        filenames = dotenvFlow.listFiles('/path/to/project')
           .map(p => normalizePosixPath(p));
       });
 
@@ -62,8 +62,8 @@ describe('dotenv-flow (API)', () => {
     describe('when the `node_env` option is given', () => {
       let filenames;
 
-      beforeEach('apply `.listDotenvFiles` with the `node_env` option', () => {
-        filenames = dotenvFlow.listDotenvFiles('/path/to/project', { node_env: 'development' })
+      beforeEach('apply `.listFiles` with the `node_env` option', () => {
+        filenames = dotenvFlow.listFiles('/path/to/project', { node_env: 'development' })
           .map(p => normalizePosixPath(p));
       });
 
@@ -102,8 +102,8 @@ describe('dotenv-flow (API)', () => {
     describe('when the `node_env` option is set to "test"', () => {
       let filenames;
 
-      beforeEach('apply `.listDotenvFiles` with the `node_env` option value of "test"', () => {
-        filenames = dotenvFlow.listDotenvFiles('/path/to/project', { node_env: 'test' })
+      beforeEach('apply `.listFiles` with the `node_env` option value of "test"', () => {
+        filenames = dotenvFlow.listFiles('/path/to/project', { node_env: 'test' })
           .map(p => normalizePosixPath(p));
       });
 

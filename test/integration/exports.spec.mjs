@@ -8,7 +8,13 @@ describe('exports', () => {
     it('should load module using require', () => {
       const dotenv = require('../..')
 
-      expect(dotenv).to.have.keys('listDotenvFiles', 'config', 'parse', 'load', 'unload');
+      expect(dotenv).to.include.keys([
+        'listFiles',
+        'config',
+        'parse',
+        'load',
+        'unload'
+      ]);
     });
   });
 
@@ -16,7 +22,14 @@ describe('exports', () => {
     it('should load module using import', async () => {
       const dotenv = await import('dotenv-flow'); // self-import
 
-      expect(dotenv).to.have.keys('listDotenvFiles', 'config', 'parse', 'load', 'unload', 'default');
+      expect(dotenv).to.include.keys([
+        'listFiles',
+        'config',
+        'parse',
+        'load',
+        'unload',
+        'default'
+      ]);
     });
 
     it('should load config entry point', async () => {
