@@ -683,22 +683,28 @@ describe('dotenv-flow (API)', () => {
           .that.equals('overwritten by the `.env.local`');
       });
 
-      describe('and the `encoding` option is given', () => {
-        beforeEach('setup the `encoding` option', () => {
-          options.encoding = 'base64';
-        });
+      it('provides the `encoding` option if given', () => {
+        options.encoding = 'base64';
 
-        it('provides the given `encoding` to `fs.readFileSync` through `.unload`', () => {
-          $dotenvFiles['/path/to/project/.env'] = 'DEFAULT_ENV_VAR=ok';
+        $dotenvFiles['/path/to/project/.env'] = 'DEFAULT_ENV_VAR=ok';
 
-          dotenvFlow.config(options);
+        dotenvFlow.config(options);
 
-          expect($readFileSync.firstCall)
-            .to.have.been.calledWith(normalize('/path/to/project/.env'), { encoding: 'base64' });
+        expect($readFileSync.firstCall)
+          .to.have.been.calledWith(normalize('/path/to/project/.env'), { encoding: 'base64' });
 
-          expect($readFileSync.secondCall)
-            .to.have.been.calledWith(normalize('/path/to/project/.env'), { encoding: 'base64' });
-        });
+        expect($readFileSync.secondCall)
+          .to.have.been.calledWith(normalize('/path/to/project/.env'), { encoding: 'base64' });
+      });
+
+      it("loads the rest of `.env*` files even if `.env` file doesn't exist", () => {
+        delete $dotenvFiles['/path/to/project/.env'];
+
+        dotenvFlow.config(options);
+
+        expect(process.env)
+            .to.have.property('ENV_VAR')
+            .that.equals('overwritten by the `.env.local`');
       });
     });
 
