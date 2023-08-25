@@ -29,10 +29,16 @@ $ yarn add dotenv-flow
 
 ## Usage
 
-As early as possible in your application, require and configure **dotenv-flow**.
+As early as possible in your Node.js application initialize **dotenv-flow**:
 
 ```js
 require('dotenv-flow').config();
+```
+
+or, if you're using typescript:
+
+```ts
+import 'dotenv-flow/config';
 ```
 
 After this, you can access all the environment variables you have defined in your `.env*` files through `process.env.*`.
