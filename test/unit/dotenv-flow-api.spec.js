@@ -34,11 +34,6 @@ describe('dotenv-flow (API)', () => {
           .map(p => normalizePosixPath(p));
       });
 
-      it('lists the default `.env.defaults` file', () => {
-        expect(filenames)
-          .to.include('/path/to/project/.env.defaults');
-      });
-
       it('lists the default `.env` file', () => {
         expect(filenames)
           .to.include('/path/to/project/.env');
@@ -52,7 +47,6 @@ describe('dotenv-flow (API)', () => {
       it('lists `.env*` files in the "variables overwriting" order', () => {
         expect(filenames)
           .to.have.ordered.members([
-            "/path/to/project/.env.defaults",
             '/path/to/project/.env',
             '/path/to/project/.env.local'
           ]);
@@ -90,7 +84,6 @@ describe('dotenv-flow (API)', () => {
       it('lists `.env*` files in the "variables overwriting" order', () => {
         expect(filenames)
           .to.have.ordered.members([
-            '/path/to/project/.env.defaults',
             '/path/to/project/.env',
             '/path/to/project/.env.local',
             '/path/to/project/.env.development',

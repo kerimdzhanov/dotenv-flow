@@ -247,20 +247,6 @@ Since multiple `.env*` files are loaded simultaneously, all the variables define
 4) `NODE_ENV`-specific local env files (`.env.development.local`, `.env.production.local`, etc.) have the highest priority over all the env files. _As with `.env.local`, create them only if you need to overwrite `NODE_ENV`-specific values for your own environment-specific needs_;
 5) Environment variables that are already set will not be overwritten, that means that the command line variables have a higher priority over all those defined in env files;
 
-
-## Alternative defaults: `.env.defaults` 
-
-In addition to `.env`, you may also use `.env.defaults` to store default (fallback) values.
-
-This may come handy e.g. when migrating from [dotenv](https://github.com/motdotla/dotenv) (where it is strongly advised against committing `.env` file to VCS)
-and you already have `.env` file used to store your local values.
-
-In such case, you may prefer to keep using your existing `.env` (**ignored** by VCS) as your local config
-and create additional `.env.defaults` (**tracked** by VCS) file which will be loaded before `.env`. 
-
-Then at every place `.env` is mentioned in the docs, read it as: "`.env.defaults` first, then `.env`".
-
-
 ## `dotenv-flow/config` options
 
 When preloading **dotenv-flow** using the node's `-r` switch you can use the following configuration options:
@@ -449,8 +435,7 @@ const dotenvFlow = require('dotenv-flow');
 const filenames = dotenvFlow.listFiles('/path/to/project', { node_env: 'development' });
 
 console.log(filenames); // will output the following:
-// > [ '/path/to/project/.env.defaults',
-// >   '/path/to/project/.env',
+// > [ '/path/to/project/.env',
 // >   '/path/to/project/.env.local',
 // >   '/path/to/project/.env.development',
 // >   '/path/to/project/.env.development.local' ]
