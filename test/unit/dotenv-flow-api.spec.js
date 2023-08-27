@@ -127,7 +127,10 @@ describe('dotenv-flow (API)', () => {
       beforeEach('stub the `.env` file content', () => {
         $readFileSync
           .withArgs('/path/to/project/.env')
-          .returns('DEFAULT_ENV_VAR=ok');
+          .returns('DEFAULT_ENV_VAR=ok')
+
+          .withArgs('/path/to/project/non-existent-file')
+          .throws(new Error("ENOENT: no such file or directory, open '/path/to/project/non-existent-file'"));
       });
 
       it('returns the parsed content of the file as an object', () => {
@@ -136,6 +139,18 @@ describe('dotenv-flow (API)', () => {
         expect(parsed)
           .to.be.an('object')
           .with.property('DEFAULT_ENV_VAR', 'ok');
+      });
+
+      it('provides the value of `options.encoding` to `fs.readFileSync` if given', () => {
+        dotenvFlow.parse('/path/to/project/.env', { encoding: 'base64' });
+
+        expect($readFileSync)
+            .to.have.been.calledWith('/path/to/project/.env', { encoding: 'base64' });
+      });
+
+      it("throws if file doesn't exist", () => {
+        expect(() => dotenvFlow.parse('/path/to/project/non-existent-file'))
+          .to.throw("ENOENT: no such file or directory, open '/path/to/project/non-existent-file'");
       });
     });
 
@@ -182,20 +197,44 @@ describe('dotenv-flow (API)', () => {
             BOTH_ENVS_VAR: 'ok'
           });
       });
-    });
 
-    describe('when the `encoding` option is given', () => {
-      beforeEach('stub the `.env` file content', () => {
+      it('provides the value of `options.encoding` to `fs.readFileSync` if given', () => {
         $readFileSync
-          .withArgs('/path/to/project/.env')
-          .returns('DEFAULT_ENV_VAR=ok');
-      });
+            .withArgs('/path/to/project/.env')
+            .returns('DEFAULT_ENV_VAR=ok')
 
-      it('provides the given `encoding` to `fs.readFileSync`', () => {
-        dotenvFlow.parse('/path/to/project/.env', { encoding: 'base64' });
+            .withArgs('/path/to/project/.env.local')
+            .returns('LOCAL_ENV_VAR=ok');
+
+        dotenvFlow.parse([
+          '/path/to/project/.env',
+          '/path/to/project/.env.local'
+        ], { encoding: 'base64' });
 
         expect($readFileSync)
-          .to.have.been.calledWith('/path/to/project/.env', { encoding: 'base64' });
+            .to.have.been.calledWith('/path/to/project/.env', { encoding: 'base64' });
+
+        expect($readFileSync)
+            .to.have.been.calledWith('/path/to/project/.env.local', { encoding: 'base64' });
+      });
+
+      it("throws if any of the given files doesn't exist", () => {
+        $readFileSync
+          .withArgs('/path/to/project/.env')
+          .returns('DEFAULT_ENV_VAR=ok')
+
+          .withArgs('/path/to/project/.env.local')
+          .returns('LOCAL_ENV_VAR=ok')
+
+          .withArgs('/path/to/project/non-existent-file')
+          .throws(new Error("ENOENT: no such file or directory, open '/path/to/project/non-existent-file'"));
+
+        expect(() => dotenvFlow.parse([
+          '/path/to/project/.env',
+          '/path/to/project/non-existent-file',
+          '/path/to/project/.env.local'
+        ]))
+          .to.throw("ENOENT: no such file or directory, open '/path/to/project/non-existent-file'");
       });
     });
   });
