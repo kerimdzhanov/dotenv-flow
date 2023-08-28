@@ -3,7 +3,7 @@
 const {expect} = require('chai');
 const sinon = require('sinon');
 const fs = require('fs');
-const {normalize} = require('path');
+const {normalize, sep} = require('path');
 const {isWindows, normalizePosixPath} = require('../integration/helpers/windows');
 
 const dotenvFlow = require('../../lib/dotenv-flow');
@@ -770,7 +770,7 @@ describe('dotenv-flow (API)', () => {
       });
     });
 
-    describe('the return object', () => {
+    describe('the returning object', () => {
       it('includes the parsed contents of the files in the `parsed` property', () => {
         $dotenvFiles['/path/to/project/.env'] = 'DEFAULT_ENV_VAR=ok';
         $dotenvFiles['/path/to/project/.env.local'] = 'LOCAL_ENV_VAR=ok';
@@ -816,6 +816,85 @@ describe('dotenv-flow (API)', () => {
           .with.property('error')
           .that.is.an('error')
           .with.property('message', 'file reading error stub');
+      });
+    });
+
+    describe('when none of the appropriate ".env*" files is present', () => {
+      it('returns "no `.env*` files" error', () => {
+        const result = dotenvFlow.config();
+
+        expect(result)
+          .to.be.an('object')
+          .with.property('error')
+          .that.is.an('error')
+          .with.property('message')
+          .that.matches(/no "\.env\*" files/);
+      });
+
+      describe('and no `node_env`-specific environment is set', () => {
+        it('returns an error with a message indicating the working directory', () => {
+          const noopResult = dotenvFlow.config();
+
+          expect(noopResult.error)
+              .to.be.an('error')
+              .with.property('message')
+              .that.includes('/path/to/project');
+
+          const pathResult = dotenvFlow.config({
+            path: '/path/to/another/project'
+          });
+
+          expect(pathResult.error)
+              .to.be.an('error')
+              .with.property('message')
+              .that.includes('/path/to/another/project');
+        });
+
+        it('returns an error with a message indicating the default ".env[.local]" setup', () => {
+          const result = dotenvFlow.config();
+
+          const expectedPattern = `/path/to/project${sep}.env[.local]`;
+
+          expect(result.error)
+            .to.be.an('error')
+            .with.property('message')
+            .that.includes(`"${expectedPattern}"`);
+        });
+      });
+
+      describe('and `process.env.NODE_ENV` is specified', () => {
+        beforeEach('setup `process.env.NODE_ENV`', () => {
+          process.env.NODE_ENV = 'development';
+        });
+
+        it('returns an error with a message indicating the working directory', () => {
+          const noopResult = dotenvFlow.config();
+
+          expect(noopResult.error)
+            .to.be.an('error')
+            .with.property('message')
+            .that.includes('/path/to/project');
+
+          const pathResult = dotenvFlow.config({
+            path: '/path/to/another/project'
+          });
+
+          expect(pathResult.error)
+            .to.be.an('error')
+            .with.property('message')
+            .that.includes('/path/to/another/project');
+        });
+
+        it('returns an error with a message indicating the node_env-specific setup', () => {
+          const result = dotenvFlow.config();
+
+          const expectedPattern = `/path/to/project${sep}.env[.development][.local]`;
+
+          expect(result.error)
+            .to.be.an('error')
+            .with.property('message')
+            .that.includes(`"${expectedPattern}"`);
+        });
       });
     });
   });
