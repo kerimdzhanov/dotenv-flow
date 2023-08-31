@@ -27,89 +27,404 @@ function isolateProcessEnv() {
 describe('dotenv-flow (API)', () => {
   describe('.listFiles', () => {
     describe('by default (when no options are given)', () => {
-      let filenames;
-
-      beforeEach('apply `.listFiles` without extra options', () => {
-        filenames = dotenvFlow.listFiles('/path/to/project')
-          .map(p => normalizePosixPath(p));
-      });
-
-      it('lists the default `.env.defaults` file', () => {
-        expect(filenames)
-          .to.include('/path/to/project/.env.defaults');
+      it('lists the `.env.defaults` file', () => {
+        expect(dotenvFlow.listFiles())
+          .to.include('.env.defaults');
       });
 
       it('lists the default `.env` file', () => {
-        expect(filenames)
-          .to.include('/path/to/project/.env');
+        expect(dotenvFlow.listFiles())
+          .to.include('.env');
       });
 
       it('lists the `.env.local` file', () => {
-        expect(filenames)
-          .to.include('/path/to/project/.env.local');
+        expect(dotenvFlow.listFiles())
+          .to.include('.env.local');
       });
 
-      it('lists `.env*` files in the "variables overwriting" order', () => {
-        expect(filenames)
+      it('lists `.env*` files in the "environment cascade" order', () => {
+        expect(dotenvFlow.listFiles())
           .to.have.ordered.members([
-            "/path/to/project/.env.defaults",
-            '/path/to/project/.env',
-            '/path/to/project/.env.local'
+            '.env.defaults',
+            '.env',
+            '.env.local'
           ]);
       });
     });
 
     describe('when the `node_env` option is given', () => {
-      let filenames;
+      let options;
 
-      beforeEach('apply `.listFiles` with the `node_env` option', () => {
-        filenames = dotenvFlow.listFiles('/path/to/project', { node_env: 'development' })
-          .map(p => normalizePosixPath(p));
+      beforeEach('setup `options.node_env`', () => {
+        options = { node_env: 'development' };
+      });
+
+      it('lists the `.env.defaults` file', () => {
+        expect(dotenvFlow.listFiles(options))
+          .to.include('.env.defaults');
       });
 
       it('lists the default `.env` file', () => {
-        expect(filenames)
-          .to.include('/path/to/project/.env');
+        expect(dotenvFlow.listFiles(options))
+          .to.include('.env');
       });
 
       it('lists the `.env.local` file', () => {
-        expect(filenames)
-          .to.include('/path/to/project/.env.local');
+        expect(dotenvFlow.listFiles(options))
+          .to.include('.env.local');
       });
 
-      it('lists the node_env-specific file', () => {
-        expect(filenames)
-          .to.include('/path/to/project/.env.development');
+      it('lists the "node_env-specific" file', () => {
+        expect(dotenvFlow.listFiles(options))
+          .to.include('.env.development');
       });
 
-      it('lists the node_env-specific local file', () => {
-        expect(filenames)
-          .to.include('/path/to/project/.env.development.local');
+      it('lists the "node_env-specific" local file', () => {
+        expect(dotenvFlow.listFiles(options))
+          .to.include('.env.development.local');
       });
 
-      it('lists `.env*` files in the "variables overwriting" order', () => {
-        expect(filenames)
+      it('lists `.env*` files in the "environment cascade" order', () => {
+        expect(dotenvFlow.listFiles(options))
           .to.have.ordered.members([
-            '/path/to/project/.env.defaults',
-            '/path/to/project/.env',
-            '/path/to/project/.env.local',
-            '/path/to/project/.env.development',
-            '/path/to/project/.env.development.local'
+            '.env.defaults',
+            '.env',
+            '.env.local',
+            '.env.development',
+            '.env.development.local'
           ]);
       });
     });
 
     describe('when the `node_env` option is set to "test"', () => {
-      let filenames;
+      let options;
 
-      beforeEach('apply `.listFiles` with the `node_env` option value of "test"', () => {
-        filenames = dotenvFlow.listFiles('/path/to/project', { node_env: 'test' })
-          .map(p => normalizePosixPath(p));
+      beforeEach('set `options.node_env` to "test"', () => {
+        options = { node_env: 'test' };
       });
 
       it("doesn't list the `.env.local` file", () => {
-        expect(filenames)
-          .to.not.include('/path/to/project/.env.local');
+        expect(dotenvFlow.listFiles(options))
+          .to.not.include('.env.local');
+      });
+
+      it('lists `.env*` files in the "environment cascade" order', () => {
+        expect(dotenvFlow.listFiles(options))
+          .to.have.ordered.members([
+            '.env.defaults',
+            '.env',
+            '.env.test',
+            '.env.test.local'
+          ]);
+      });
+    });
+
+    describe('when the `pattern` option is set to ".env/[local/]env[.node_env]"', () => {
+      let options;
+
+      beforeEach('setup `options.pattern`', () => {
+        options = {
+          pattern: '.env/[local/]env[.node_env]'
+        };
+      });
+
+      describe('and no `node_env` option is given', () => {
+        it('lists `.env/env` as a default `.env` file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env/env');
+        });
+
+        it('lists `.env/local/env` as `.env.local` file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env/local/env');
+        });
+
+        it('lists `.env*` files in the "environment cascade" order', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.have.ordered.members([
+              '.env/env',
+              '.env/local/env'
+            ]);
+          });
+      });
+
+      describe('and the `node_env` option is given', () => {
+        beforeEach('setup `.options.node_env`', () => {
+          options.node_env = 'development';
+        });
+
+        it('lists `.env/env` as a default `.env` file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env/env');
+        });
+
+        it('lists `.env/local/env` as `.env.local` file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env/local/env');
+        });
+
+        it('lists `.env/env.development` as a "node_env-specific" file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env/env.development');
+        });
+
+        it('lists `.env/local/env.development` as a local "node_env-specific" file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env/local/env.development');
+        });
+
+        it('lists `.env*` files in the "environment cascade" order', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.have.ordered.members([
+              '.env/env',
+              '.env/local/env',
+              '.env/env.development',
+              '.env/local/env.development'
+            ]);
+        });
+      });
+
+      describe('and the `node_env` option is set to "test"', () => {
+        beforeEach('set `.options.node_env` to "test"', () => {
+          options.node_env = 'test';
+        });
+
+        it("doesn't list the `.env.local` file", () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.not.include('.env.local');
+        });
+
+        it('lists `.env*` files in the "environment cascade" order', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.have.ordered.members([
+              '.env/env',
+              '.env/env.test',
+              '.env/local/env.test'
+            ]);
+        });
+      });
+    });
+
+    describe('when the `pattern` option is set to ".env/[.node_env/].env[.node_env][.local]"', () => {
+      let options;
+
+      beforeEach('setup `options.pattern`', () => {
+        options = {
+          pattern: '.env/[node_env/].env[.node_env][.local]'
+        };
+      });
+
+      describe('and no `node_env` option is given', () => {
+        it('lists `.env/.env` as a default `.env` file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env/.env');
+        });
+
+        it('lists `.env/env.local` as `.env.local` file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env/.env.local');
+        });
+
+        it('lists `.env*` files in the "environment cascade" order', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.have.ordered.members([
+              '.env/.env',
+              '.env/.env.local'
+            ]);
+        });
+      });
+
+      describe('and the `node_env` option is given', () => {
+        beforeEach('setup `.options.node_env`', () => {
+          options.node_env = 'development';
+        });
+
+        it('lists `.env/.env` as a default `.env` file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env/.env');
+        });
+
+        it('lists `.env/.env.local` as `.env.local` file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env/.env.local');
+        });
+
+        it('lists `.env/development/.env.development` as a "node_env-specific" file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env/development/.env.development');
+        });
+
+        it('lists `.env/development/.env.development.local` as a local "node_env-specific" file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env/development/.env.development.local');
+        });
+
+        it('lists `.env*` files in the "environment cascade" order', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.have.ordered.members([
+              '.env/.env',
+              '.env/.env.local',
+              '.env/development/.env.development',
+              '.env/development/.env.development.local'
+            ]);
+        });
+      });
+
+      describe('and the `node_env` option is set to "test"', () => {
+        beforeEach('set `.options.node_env` to "test"', () => {
+          options.node_env = 'test';
+        });
+
+        it("doesn't list the `.env.local` file", () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.not.include('.env.local');
+        });
+
+        it('lists `.env*` files in the "environment cascade" order', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.have.ordered.members([
+              '.env/.env',
+              '.env/test/.env.test',
+              '.env/test/.env.test.local'
+            ]);
+        });
+      });
+    });
+
+    describe('when the `pattern` option is set to ".env[.local]" (no `[node_env]` placeholder specified)', () => {
+      let options;
+
+      beforeEach('setup `options.pattern`', () => {
+        options = {
+          pattern: '.env[.local]'
+        };
+      });
+
+      describe('and no `node_env` option is given', () => {
+        it('lists the default `.env` file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env');
+        });
+
+        it('lists the `.env.local` file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env.local');
+        });
+
+        it('lists `.env*` files in the "environment cascade" order', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.have.ordered.members([
+              '.env',
+              '.env.local'
+            ]);
+        });
+      });
+
+      describe('and the `node_env` option is given', () => {
+        beforeEach('setup `.options.node_env`', () => {
+          options.node_env = 'development';
+        });
+
+        it('lists the default `.env` file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env');
+        });
+
+        it('lists the `env.local` file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env.local');
+        });
+
+        it("doesn't list any \"node_env-specific\" files", () => {
+          for (const filename of dotenvFlow.listFiles(options)) {
+            expect(filename).to.not.include('development');
+          }
+        });
+
+        it('lists `.env*` files in the "environment cascade" order', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.have.ordered.members([
+              '.env',
+              '.env.local'
+            ]);
+        });
+      });
+
+      describe('and the `node_env` option is set to "test"', () => {
+        beforeEach('set `.options.node_env` to "test"', () => {
+          options.node_env = 'test';
+        });
+
+        it('lists only the default `.env` file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.deep.equal(['.env']);
+        });
+      });
+    });
+
+    describe('when the `pattern` option is set to ".env[.node_env]" (no `[local]` placeholder specified)', () => {
+      let options;
+
+      beforeEach('setup `options.pattern`', () => {
+        options = {
+          pattern: '.env[.node_env]'
+        };
+      });
+
+      describe('and no `node_env` option is given', () => {
+        it('lists only the default `.env` file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.deep.equal(['.env']);
+        });
+      });
+
+      describe('and the `node_env` option is given', () => {
+        beforeEach('setup `.options.node_env`', () => {
+          options.node_env = 'development';
+        });
+
+        it('lists the default `.env` file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env');
+        });
+
+        it('lists the "node_env-specific" file', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.include('.env.development');
+        });
+
+        it("doesn't list any `.local` files", () => {
+          for (const filename of dotenvFlow.listFiles(options)) {
+            expect(filename).to.not.include('local');
+          }
+        });
+
+        it('lists `.env*` files in the "environment cascade" order', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.have.ordered.members([
+              '.env',
+              '.env.development'
+            ]);
+        });
+      });
+
+      describe('and the `node_env` option is set to "test"', () => {
+        beforeEach('set `.options.node_env` to "test"', () => {
+          options.node_env = 'test';
+        });
+
+        it("doesn't list the `.env.local` file", () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.not.include('.env.local');
+        });
+
+        it('lists `.env*` files in the "environment cascade" order', () => {
+          expect(dotenvFlow.listFiles(options))
+            .to.have.ordered.members([
+              '.env',
+              '.env.test'
+            ]);
+        });
       });
     });
   });
@@ -489,7 +804,7 @@ describe('dotenv-flow (API)', () => {
           .to.have.property('LOCAL_ENV_VAR', 'ok');
       });
 
-      it('loads the node_env-specific env file', () => {
+      it('loads the "node_env-specific" env file', () => {
         $dotenvFiles['/path/to/project/.env.development'] = 'DEVELOPMENT_ENV_VAR=ok';
 
         expect(process.env)
@@ -501,7 +816,7 @@ describe('dotenv-flow (API)', () => {
           .to.have.property('DEVELOPMENT_ENV_VAR', 'ok');
       });
 
-      it('loads the node_env-specific local env file', () => {
+      it('loads the "node_env-specific" local env file', () => {
         $dotenvFiles['/path/to/project/.env.development.local'] = 'DEVELOPMENT_LOCAL_ENV_VAR=ok';
 
         expect(process.env)
@@ -543,7 +858,7 @@ describe('dotenv-flow (API)', () => {
           .to.have.property('LOCAL_ENV_VAR', 'ok');
       });
 
-      it('loads the node_env-specific env file', () => {
+      it('loads the "node_env-specific" env file', () => {
         $dotenvFiles['/path/to/project/.env.development'] = 'DEVELOPMENT_ENV_VAR=ok';
 
         expect(process.env)
@@ -557,7 +872,7 @@ describe('dotenv-flow (API)', () => {
           .to.have.property('DEVELOPMENT_ENV_VAR', 'ok');
       });
 
-      it('loads the node_env-specific local env file', () => {
+      it('loads the "node_env-specific" local env file', () => {
         $dotenvFiles['/path/to/project/.env.development.local'] = 'DEVELOPMENT_LOCAL_ENV_VAR=ok';
 
         expect(process.env)
@@ -618,7 +933,7 @@ describe('dotenv-flow (API)', () => {
           .to.have.property('LOCAL_ENV_VAR', 'ok');
       });
 
-      it('loads the node_env-specific env file', () => {
+      it('loads the "node_env-specific" env file', () => {
         $dotenvFiles['/path/to/project/.env.development'] = 'DEVELOPMENT_ENV_VAR=ok';
 
         expect(process.env)
@@ -632,7 +947,7 @@ describe('dotenv-flow (API)', () => {
           .to.have.property('DEVELOPMENT_ENV_VAR', 'ok');
       });
 
-      it('loads the node_env-specific local env file', () => {
+      it('loads the "node_env-specific" local env file', () => {
         $dotenvFiles['/path/to/project/.env.development.local'] = 'DEVELOPMENT_LOCAL_ENV_VAR=ok';
 
         expect(process.env)
@@ -682,6 +997,28 @@ describe('dotenv-flow (API)', () => {
 
         expect(process.env)
           .to.have.property('DEFAULT_ENV_VAR', 'ok');
+      });
+    });
+
+    describe('when the `pattern` option is given', () => {
+      it('read files by the given `.env*` files naming convention', () => {
+        $dotenvFiles['/path/to/project/.env/env'] = 'DEFAULT_ENV_VAR=ok';
+        $dotenvFiles['/path/to/project/.env/env.development'] = 'DEVELOPMENT_ENV_VAR=ok';
+        $dotenvFiles['/path/to/project/.env/local/env'] = 'LOCAL_ENV_VAR=ok';
+        $dotenvFiles['/path/to/project/.env/local/env.development'] = 'DEVELOPMENT_LOCAL_ENV_VAR=ok';
+
+        dotenvFlow.config({
+          pattern: '.env/[local/]env[.node_env]',
+          node_env: 'development'
+        });
+
+        expect(process.env)
+          .to.include({
+            DEFAULT_ENV_VAR: 'ok',
+            DEVELOPMENT_ENV_VAR: 'ok',
+            LOCAL_ENV_VAR: 'ok',
+            DEVELOPMENT_LOCAL_ENV_VAR: 'ok',
+          });
       });
     });
 
@@ -742,8 +1079,8 @@ describe('dotenv-flow (API)', () => {
         dotenvFlow.config(options);
 
         expect(process.env)
-            .to.have.property('ENV_VAR')
-            .that.equals('overwritten by the `.env.local`');
+          .to.have.property('ENV_VAR')
+          .that.equals('overwritten by the `.env.local`');
       });
     });
 
@@ -885,7 +1222,7 @@ describe('dotenv-flow (API)', () => {
             .that.includes('/path/to/another/project');
         });
 
-        it('returns an error with a message indicating the node_env-specific setup', () => {
+        it('returns an error with a message indicating the "node_env-specific" setup', () => {
           const result = dotenvFlow.config();
 
           const expectedPattern = `/path/to/project${sep}.env[.development][.local]`;
