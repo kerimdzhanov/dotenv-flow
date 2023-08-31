@@ -365,6 +365,54 @@ require('dotenv-flow').config({
 
 If the option is not provided, the current working directory is used.
 
+##### `options.pattern`
+###### Type: `string`
+###### Default: `".env[.node_env][.local]"`
+
+Allows you to change the default `.env*` files' naming convention
+if you want to have a specific file naming structure for maintaining
+your environment variables' files.
+
+**Default Value**
+
+The default value `".env[.node_env][.local]"` makes *dotenv-flow* look up
+and load the following files in order:
+
+1. `.env`
+2. `.env.local`
+3. `.env.${NODE_ENV}`
+4. `.env.${NODE_ENV}.local`
+
+For example, when the `proess.env.NODE_ENV` (or `options.node_env`) is set to `"development"`,
+*dotenv-flow* will be looking for and parsing (if found) the following files:
+
+1. `.env`
+2. `.env.local`
+3. `.env.development`
+4. `.env.development.local`
+
+**Custom Pattern**
+
+Here is a couple of examples of customizing the `.env*` files naming convention:
+
+For example, if you set the pattern to `".env/[local/]env[.node_env]"`,
+*dotenv-flow* will look for these files instead:
+
+1. `.env/env`
+2. `.env/local/env`
+3. `.env/env.development`
+4. `.env/local/env.development`
+
+… or if you set the pattern to `".env/[.node_env/].env[.node_env][.local]"`,
+*dotenv-flow* will try to find and parse:
+
+1. `.env/.env`
+2. `.env/.env.local`
+3. `.env/development/.env.development`
+4. `.env/development/.env.development.local`
+
+› Please refer to [`.listFiles([options])`](#listfiles-options--string) to dive deeper.
+
 ##### `options.encoding`
 ###### Type: `string`
 ###### Default: `"utf8"`
@@ -413,25 +461,77 @@ require('dotenv-flow').config({
 The following API considered as internal, but it is also exposed to give the ability to be used programmatically by your own needs.
 
 
-#### `.listFiles(dirname, [options]) => string[]`
+#### `.listFiles([options]) => string[]`
 
-Returns a list of `.env*` filenames depending on the given `options.node_env`. The resulting list is ordered by the env files priority from lowest to highest.
+Returns a list of `.env*` filenames depending on the given `options`.
 
-Also, note that the `.env.local` file will not be listed for `NODE_ENV="test"`, since normally you expect tests to produce the same results for everyone.
+The resulting list is ordered by the env files'
+variables overwriting priority from lowest to highest.
+This is also referenced as "env files' environment cascade."
 
+⚠️ Note that the `.env.local` file is not listed for "test" environment,
+since normally you expect tests to produce the same results for everyone.
 
 ##### Parameters:
 
-##### `dirname`
-###### Type: `string`
-
-A path to `.env*` files' directory.
-
-##### `[options.node_env]`
+##### `options.node_env`
 ###### Type: `string`
 ###### Default: _undefined_
 
-The node environment (development/test/production/etc,).
+The node environment (a.k.a. `process.env.NODE_ENV`).
+
+The conventionally used values are `"development"`, `"test"`
+(or `"staging"`) and `"production"`, also commonly used are `"qa"`, `"uat"`, `"ci"`.
+
+
+##### `options.pattern`
+###### Type: `string`
+###### Default: `".env[.node_env][.local]"`
+
+`.env*` files' naming convention pattern.
+
+The default one, (`".env[.node_env][.local]"`) without `options.node_env` given,
+produces the following list of filenames:
+
+- `.env`
+- `.env.local`
+
+When `options.node_env` is set, for example to `"development"`,
+it appends "node_env-specific" filenames, that will make `.listFiles` to return:
+
+- `.env`
+- `.env.local`
+- `.env.development`
+- `.env.development.local`
+
+Another example might be the pattern `".env/[local/]env[.node_env]"`,
+that without `options.node_env` will produce:
+
+- `.env/env`
+- `.env/local/env`
+
+… and if `options.node_env` is set to (for example) `"development"`,
+will append "node_env-specific" files producing the following:
+
+- `.env/env`
+- `.env/local/env`
+- `.env/env.development`
+- `.env/local/development`
+
+Also, note that if `[node_env]` placeholders is missing in the pattern,
+none of the "node_env-specific" files fill be listed.
+For example, a pattern like `".env[.local]"`,
+independently of whether the `options.node_env` is set, will always produce:
+
+- `.env`
+- `.env.local`
+
+… except the case when `options.node_env` is set to `"test"`,
+which (as mentioned above) will exclude `.env.local` producing just a single:
+
+- `.env`
+
+… since normally we expect tests to produce the same results for everyone.
 
 
 ##### Returns:
@@ -446,7 +546,7 @@ A list of `.env*` filenames.
 ```js
 const dotenvFlow = require('dotenv-flow');
 
-const filenames = dotenvFlow.listFiles('/path/to/project', { node_env: 'development' });
+const filenames = dotenvFlow.listFiles({ node_env: 'development' });
 
 console.log(filenames); // will output the following:
 // > [ '/path/to/project/.env.defaults',
@@ -471,7 +571,7 @@ When several filenames are given, the parsed variables are merged into a single 
 
 A filename or a list of filenames to parse.
 
-##### `[options.encoding]`
+##### `options.encoding`
 ###### Type: `string`
 ###### Default: `"utf8"`
 
@@ -527,13 +627,13 @@ But eventually, assigning the parsed environment variables to `process.env` is d
 
 A filename or a list of filenames to load.
 
-##### `[options.encoding]`
+##### `options.encoding`
 ###### Type: `string`
 ###### Default: `"utf8"`
 
 An optional encoding for reading files.
 
-##### `[options.silent]`
+##### `options.silent`
 ###### Type: `boolean`
 ###### Default: `false`
 
@@ -543,8 +643,10 @@ Suppress all the console outputs except errors and deprecation warnings.
 
 ###### Type: `object`
 
-The returning object have the same shape as the `.config()`'s, it will contain the `parsed` property with a parsed content of a given file(s) or the `error` property if the parsing is failed.
-
+The same as `.config()`, the returning object contains
+`.parsed` property with a parsed content of the given file(s),
+or if parsing is failed the `.error` property with a reference
+to the reasoning error.
 
 ##### Example:
 
@@ -592,7 +694,7 @@ The environment variables that are predefined (i.e. by the shell) will not be un
 
 A filename or a list of filenames to unload.
 
-##### `[options.encoding]`
+##### `options.encoding`
 ###### Type: `string`
 ###### Default: `"utf8"`
 
