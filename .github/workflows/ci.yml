@@ -7,7 +7,7 @@ on:
   push:
     branches:
       - master
-      - feature/*
+      - "feature/**"
       - v3.x
   pull_request:
     branches: [ "*" ]
