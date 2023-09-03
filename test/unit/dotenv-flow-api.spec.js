@@ -1168,46 +1168,11 @@ describe('dotenv-flow (API)', () => {
           .that.matches(/no "\.env\*" files/);
       });
 
-      describe('and no `node_env`-specific environment is set', () => {
+      describe('and no "node_env-related" options are specified', () => {
         it('returns an error with a message indicating the working directory', () => {
-          const noopResult = dotenvFlow.config();
+          const defaultResult = dotenvFlow.config();
 
-          expect(noopResult.error)
-              .to.be.an('error')
-              .with.property('message')
-              .that.includes('/path/to/project');
-
-          const pathResult = dotenvFlow.config({
-            path: '/path/to/another/project'
-          });
-
-          expect(pathResult.error)
-              .to.be.an('error')
-              .with.property('message')
-              .that.includes('/path/to/another/project');
-        });
-
-        it('returns an error with a message indicating the default ".env[.local]" setup', () => {
-          const result = dotenvFlow.config();
-
-          const expectedPattern = `/path/to/project${sep}.env[.local]`;
-
-          expect(result.error)
-            .to.be.an('error')
-            .with.property('message')
-            .that.includes(`"${expectedPattern}"`);
-        });
-      });
-
-      describe('and `process.env.NODE_ENV` is specified', () => {
-        beforeEach('setup `process.env.NODE_ENV`', () => {
-          process.env.NODE_ENV = 'development';
-        });
-
-        it('returns an error with a message indicating the working directory', () => {
-          const noopResult = dotenvFlow.config();
-
-          expect(noopResult.error)
+          expect(defaultResult.error)
             .to.be.an('error')
             .with.property('message')
             .that.includes('/path/to/project');
@@ -1222,15 +1187,64 @@ describe('dotenv-flow (API)', () => {
             .that.includes('/path/to/another/project');
         });
 
-        it('returns an error with a message indicating the "node_env-specific" setup', () => {
-          const result = dotenvFlow.config();
+        it('returns an error with a message indicating the naming convention pattern', () => {
+          const defaultResult = dotenvFlow.config();
 
-          const expectedPattern = `/path/to/project${sep}.env[.development][.local]`;
-
-          expect(result.error)
+          expect(defaultResult.error)
             .to.be.an('error')
             .with.property('message')
-            .that.includes(`"${expectedPattern}"`);
+            .that.includes('.env[.node_env][.local]');
+
+          const patternResult = dotenvFlow.config({
+            pattern: 'config/[local/].env[.node_env]'
+          });
+
+          expect(patternResult.error)
+            .to.be.an('error')
+            .with.property('message')
+            .that.includes('config/[local/].env[.node_env]');
+        });
+      });
+
+      describe('and `process.env.NODE_ENV` is specified', () => {
+        beforeEach('setup `process.env.NODE_ENV`', () => {
+          process.env.NODE_ENV = 'development';
+        });
+
+        it('returns an error with a message indicating the working directory', () => {
+          const defaultResult = dotenvFlow.config();
+
+          expect(defaultResult.error)
+            .to.be.an('error')
+            .with.property('message')
+            .that.includes('/path/to/project');
+
+          const pathResult = dotenvFlow.config({
+            path: '/path/to/another/project'
+          });
+
+          expect(pathResult.error)
+            .to.be.an('error')
+            .with.property('message')
+            .that.includes('/path/to/another/project');
+        });
+
+        it('returns an error with a message indicating the naming convention pattern for the specified node_env', () => {
+          const defaultResult = dotenvFlow.config();
+
+          expect(defaultResult.error)
+            .to.be.an('error')
+            .with.property('message')
+            .that.includes('.env[.development][.local]');
+
+          const patternResult = dotenvFlow.config({
+            pattern: 'config/[local/].env[.node_env]'
+          });
+
+          expect(patternResult.error)
+            .to.be.an('error')
+            .with.property('message')
+            .that.includes('config/[local/].env[.development]');
         });
       });
     });
