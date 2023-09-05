@@ -1,14 +1,21 @@
-# dotenv-flow [![npm version](https://badge.fury.io/js/dotenv-flow.svg)](https://badge.fury.io/js/dotenv-flow)
+# dotenv-flow
 
 <img src="https://raw.githubusercontent.com/kerimdzhanov/dotenv-flow/master/dotenv-flow@2x.png" alt="dotenv-flow" width="280" height="140" align="right" />
 
-[dotenv](https://github.com/motdotla/dotenv) is a zero-dependency npm module that loads environment variables from a `.env` file into [`process.env`](https://nodejs.org/docs/latest/api/process.html#process_process_env).
+> _[dotenv](https://github.com/motdotla/dotenv) is a zero-dependency npm module that loads environment variables from a `.env` file into [`process.env`](https://nodejs.org/docs/latest/api/process.html#process_process_env)._
 
-**dotenv-flow** extends **dotenv** adding the ability to have multiple `.env*` files like `.env.development`, `.env.test` and `.env.production`, also allowing defined variables to be overwritten individually in the appropriate `.env*.local` file.
+**dotenv-flow** extends _dotenv_, adding support of `NODE_ENV`-specific `.env*` files _like `.env.development`, `.env.test`, `.env.stage`, and `.env.production`,_ and the appropriate `.env*.local` overrides.
 
-Storing configuration in _environment variables_ separate from code and grouping them by environments like _development_, _test_ and _production_ is based on [The Twelve-Factor App](https://12factor.net/config) methodology.
+It allows your app to have multiple environments _(like "development", "test", "stage", and "production" respectively)_ with selectively-adjusted environment variable setups and load them dynamically depending on the current `NODE_ENV`.
+
+In addition to that, `.env*.local` overrides adds the ability to overwite variables locally for development, testing, and debugging purposes
+_(note that the appropriate `.env*.local` entry should be added to your `.gitignore`)_.
+
+🌱 Inspired by _Ruby's **dotenv** (a.k.a. `dotenv-rails`) gem_, _CreateReactApp's **storing configs in `.env*` files** approach_,
+the _Twelve-Factor App methodology_ in general, and _its **[store config in the environment](https://12factor.net/config)** section_ in particular.
 
 [![Build Status](https://github.com/kerimdzhanov/dotenv-flow/actions/workflows/ci.yml/badge.svg?branch=master&event=push)](https://github.com/kerimdzhanov/dotenv-flow/actions/workflows/ci.yml)
+[![npm version](https://badge.fury.io/js/dotenv-flow.svg)](https://badge.fury.io/js/dotenv-flow)
 [![Known Vulnerabilities](https://snyk.io/test/github/kerimdzhanov/dotenv-flow/badge.svg?targetFile=package.json)](https://snyk.io/test/github/kerimdzhanov/dotenv-flow?targetFile=package.json)
 [![npm downloads](https://badgen.net/npm/dw/dotenv-flow)](https://www.npmjs.com/package/dotenv-flow)
 
@@ -26,22 +33,49 @@ Using Yarn:
 $ yarn add dotenv-flow
 ```
 
+Using PNPM:
+
+```sh
+$ pnpm add dotenv-flow
+```
 
 ## Usage
 
-As early as possible in your Node.js application initialize **dotenv-flow**:
+As early as possible in your Node.js app, initialize **dotenv-flow**:
 
 ```js
 require('dotenv-flow').config();
 ```
 
-or, if you're using typescript:
+It will allow you to configure and use **dotenv-flow** from your code programmatically.
+
+Alternatively, you can use the default config entry point that allows you to configure **dotenv-flow** using command switch flags or predefined environment variables:
+
+```js
+require('dotenv-flow/config');
+```
+
+Or, you may want **dotenv-flow** to load environment variables for your app without adding it to the code via Node's `--require` flag, for example:
+
+```sh
+$ node -r "dotenv-flow/config" your_app.js
+```
+
+If you're using TypeScript (or ES6+ modules), to import the default config entry point (and configure **dotenv-flow** via CLI switches or env vars):
 
 ```ts
 import 'dotenv-flow/config';
 ```
 
-After this, you can access all the environment variables you have defined in your `.env*` files through `process.env.*`.
+Or, to use/configure it programmatically:
+
+```ts
+import dotenvFlow from 'dotenv-flow';
+dotenvFlow.config();
+```
+
+### How it works
+Once **dotenv-flow** is initialized (using `.config` or any other method above), environment variables defined in your `.env*` files are loaded and become accessible in your Node.js app via `process.env.*`.
 
 For example, let's suppose that you have the following `.env*` files in your project:
 
