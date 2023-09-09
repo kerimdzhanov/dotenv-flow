@@ -100,27 +100,65 @@ describe('dotenv-flow (API)', () => {
 
   describe('.listFiles', () => {
     describe('by default (when no options are given)', () => {
-      it('lists the `.env.defaults` file', () => {
+      it('lists the default `.env` file if present', () => {
         expect(dotenvFlow.listFiles())
-          .to.include('.env.defaults');
+          .to.not.include('.env');
+
+        mockFS({
+          '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok'
+        });
+
+        expect(dotenvFlow.listFiles())
+          .to.include('/path/to/project/.env');
       });
 
-      it('lists the default `.env` file', () => {
+      it('lists the `.env.local` file if present', () => {
         expect(dotenvFlow.listFiles())
-          .to.include('.env');
+          .to.not.include('/path/to/project/.env.local');
+
+        mockFS({
+          '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok'
+        });
+
+        expect(dotenvFlow.listFiles())
+          .to.include('/path/to/project/.env.local');
       });
 
-      it('lists the `.env.local` file', () => {
+      it('lists the `.env.defaults` file if present', () => {
         expect(dotenvFlow.listFiles())
-          .to.include('.env.local');
+          .to.not.include('/path/to/project/.env.defaults');
+
+        mockFS({
+          '/path/to/project/.env.defaults': 'DEFAULT_ENV_VAR=ok'
+        });
+
+        expect(dotenvFlow.listFiles())
+          .to.include('/path/to/project/.env.defaults');
       });
 
-      it('lists `.env*` files in the "environment cascade" order', () => {
+      it('lists files in the order of ascending priority', () => {
+        mockFS({
+          '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+          '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok'
+        });
+
         expect(dotenvFlow.listFiles())
           .to.have.ordered.members([
-            '.env.defaults',
-            '.env',
-            '.env.local'
+            '/path/to/project/.env',
+            '/path/to/project/.env.local'
+          ]);
+
+        // --
+
+        mockFS({
+          '/path/to/project/.env.defaults': 'DEFAULT_ENV_VAR=ok',
+          '/path/to/project/.env': 'LOCAL_ENV_VAR=ok'
+        });
+
+        expect(dotenvFlow.listFiles())
+          .to.have.ordered.members([
+            '/path/to/project/.env.defaults',
+            '/path/to/project/.env'
           ]);
       });
     });
@@ -132,39 +170,119 @@ describe('dotenv-flow (API)', () => {
         options = { node_env: 'development' };
       });
 
-      it('lists the `.env.defaults` file', () => {
+      it('lists the default `.env` file if present', () => {
         expect(dotenvFlow.listFiles(options))
-          .to.include('.env.defaults');
+          .to.not.include('/path/to/project/.env');
+
+        mockFS({
+          '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok'
+        });
+
+        expect(dotenvFlow.listFiles(options))
+          .to.include('/path/to/project/.env');
       });
 
-      it('lists the default `.env` file', () => {
+      it('lists the `.env.local` file if present', () => {
         expect(dotenvFlow.listFiles(options))
-          .to.include('.env');
+          .to.not.include('/path/to/project/.env.local');
+
+        mockFS({
+          '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok'
+        });
+
+        expect(dotenvFlow.listFiles(options))
+          .to.include('/path/to/project/.env.local');
       });
 
-      it('lists the `.env.local` file', () => {
+      it('lists the "node_env-specific" file if present', () => {
         expect(dotenvFlow.listFiles(options))
-          .to.include('.env.local');
+          .to.not.include('/path/to/project/.env.development');
+
+        mockFS({
+          '/path/to/project/.env.development': 'DEVELOPMENT_ENV_VAR=ok'
+        });
+
+        expect(dotenvFlow.listFiles(options))
+          .to.include('/path/to/project/.env.development');
       });
 
-      it('lists the "node_env-specific" file', () => {
+      it('lists the "node_env-specific" local file if present', () => {
         expect(dotenvFlow.listFiles(options))
-          .to.include('.env.development');
+          .to.not.include('/path/to/project/.env.development.local');
+
+        mockFS({
+          '/path/to/project/.env.development.local': 'LOCAL_DEVELOPMENT_ENV_VAR=ok'
+        });
+
+        expect(dotenvFlow.listFiles(options))
+          .to.include('/path/to/project/.env.development.local');
       });
 
-      it('lists the "node_env-specific" local file', () => {
+      it('lists the `.env.defaults` file if present', () => {
         expect(dotenvFlow.listFiles(options))
-          .to.include('.env.development.local');
+          .to.not.include('/path/to/project/.env.defaults');
+
+        mockFS({
+          '/path/to/project/.env.defaults': 'DEFAULT_ENV_VAR=ok'
+        });
+
+        expect(dotenvFlow.listFiles(options))
+          .to.include('/path/to/project/.env.defaults');
       });
 
-      it('lists `.env*` files in the "environment cascade" order', () => {
+      it('lists files in the order of ascending priority', () => {
+        mockFS({
+          '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+          '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok'
+        });
+
         expect(dotenvFlow.listFiles(options))
           .to.have.ordered.members([
-            '.env.defaults',
-            '.env',
-            '.env.local',
-            '.env.development',
-            '.env.development.local'
+            '/path/to/project/.env',
+            '/path/to/project/.env.local'
+          ]);
+
+        // --
+
+        mockFS({
+          '/path/to/project/.env.defaults': 'DEFAULT_ENV_VAR=ok',
+          '/path/to/project/.env': 'LOCAL_ENV_VAR=ok'
+        });
+
+        expect(dotenvFlow.listFiles(options))
+          .to.have.ordered.members([
+            '/path/to/project/.env.defaults',
+            '/path/to/project/.env',
+          ]);
+
+        // --
+
+        mockFS({
+          '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+          '/path/to/project/.env.development': 'DEVELOPMENT_ENV_VAR=ok'
+        });
+
+        expect(dotenvFlow.listFiles(options))
+          .to.have.ordered.members([
+            '/path/to/project/.env',
+            '/path/to/project/.env.development'
+          ]);
+
+        // --
+
+        mockFS({
+          '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+          '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok',
+          '/path/to/project/.env.development': 'DEVELOPMENT_ENV_VAR=ok',
+          '/path/to/project/.env.development.local': 'LOCAL_DEVELOPMENT_ENV_VAR=ok'
+        });
+
+        expect(dotenvFlow.listFiles(options))
+          .to.have.ordered.members([
+            '/path/to/project/.env',
+            '/path/to/project/.env.local',
+            '/path/to/project/.env.development',
+            '/path/to/project/.env.development.local'
           ]);
       });
     });
@@ -177,18 +295,22 @@ describe('dotenv-flow (API)', () => {
       });
 
       it("doesn't list the `.env.local` file", () => {
-        expect(dotenvFlow.listFiles(options))
-          .to.not.include('.env.local');
-      });
+        mockFS({
+          '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+          '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok',
+          '/path/to/project/.env.test': 'TEST_ENV_VAR=ok',
+          '/path/to/project/.env.test.local': 'LOCAL_TEST_ENV_VAR=ok'
+        });
 
-      it('lists `.env*` files in the "environment cascade" order', () => {
         expect(dotenvFlow.listFiles(options))
           .to.have.ordered.members([
-            '.env.defaults',
-            '.env',
-            '.env.test',
-            '.env.test.local'
-          ]);
+            '/path/to/project/.env',
+            '/path/to/project/.env.test',
+            '/path/to/project/.env.test.local'
+          ])
+          .and.not.include(
+            '/path/to/project/.env.local'
+          );
       });
     });
 
@@ -199,84 +321,123 @@ describe('dotenv-flow (API)', () => {
         options = { pattern: '.env/[local/]env[.node_env]' };
       });
 
-      describe('and no `node_env` option is given', () => {
+      describe('… and no `options.node_env` is given', () => {
         it('lists `.env/env` as a default `.env` file', () => {
+          mockFS({
+            '/path/to/project/.env/env': 'DEFAULT_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env/env');
+            .to.include('/path/to/project/.env/env');
         });
 
         it('lists `.env/local/env` as `.env.local` file', () => {
+          mockFS({
+            '/path/to/project/.env/local/env': 'LOCAL_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env/local/env');
+            .to.include('/path/to/project/.env/local/env');
         });
 
-        it('lists `.env*` files in the "environment cascade" order', () => {
+        it('lists files in the order of ascending priority', () => {
+          mockFS({
+            '/path/to/project/.env/env': 'DEFAULT_ENV_VAR=ok',
+            '/path/to/project/.env/local/env': 'LOCAL_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
             .to.have.ordered.members([
-              '.env/env',
-              '.env/local/env'
+              '/path/to/project/.env/env',
+              '/path/to/project/.env/local/env'
             ]);
           });
       });
 
-      describe('and the `node_env` option is given', () => {
+      describe('… and `options.node_env` is given', () => {
         beforeEach('setup `.options.node_env`', () => {
           options.node_env = 'development';
         });
 
         it('lists `.env/env` as a default `.env` file', () => {
+          mockFS({
+            '/path/to/project/.env/env': 'DEFAULT_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env/env');
+            .to.include('/path/to/project/.env/env');
         });
 
         it('lists `.env/local/env` as `.env.local` file', () => {
+          mockFS({
+            '/path/to/project/.env/local/env': 'LOCAL_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env/local/env');
+            .to.include('/path/to/project/.env/local/env');
         });
 
-        it('lists `.env/env.development` as a "node_env-specific" file', () => {
+        it('lists `.env/env.<node_env>` as a "node_env-specific" file', () => {
+          mockFS({
+            '/path/to/project/.env/env.development': 'DEVELOPMENT_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env/env.development');
+            .to.include('/path/to/project/.env/env.development');
         });
 
-        it('lists `.env/local/env.development` as a local "node_env-specific" file', () => {
+        it('lists `.env/local/env.<node_env>` as a local "node_env-specific" file', () => {
+          mockFS({
+            '/path/to/project/.env/local/env.development': 'LOCAL_DEVELOPMENT_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env/local/env.development');
+            .to.include('/path/to/project/.env/local/env.development');
         });
 
-        it('lists `.env*` files in the "environment cascade" order', () => {
+        it('lists files in the order of ascending priority', () => {
+          mockFS({
+            '/path/to/project/.env/env': 'DEFAULT_ENV_VAR=ok',
+            '/path/to/project/.env/local/env': 'LOCAL_ENV_VAR=ok',
+            '/path/to/project/.env/env.development': 'DEVELOPMENT_ENV_VAR=ok',
+            '/path/to/project/.env/local/env.development': 'LOCAL_DEVELOPMENT_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
             .to.have.ordered.members([
-              '.env/env',
-              '.env/local/env',
-              '.env/env.development',
-              '.env/local/env.development'
+              '/path/to/project/.env/env',
+              '/path/to/project/.env/local/env',
+              '/path/to/project/.env/env.development',
+              '/path/to/project/.env/local/env.development'
             ]);
         });
       });
 
-      describe('and the `node_env` option is set to "test"', () => {
+      describe('… and `options.node_env` is set to "test"', () => {
         beforeEach('set `.options.node_env` to "test"', () => {
           options.node_env = 'test';
         });
 
-        it("doesn't list the `.env.local` file", () => {
-          expect(dotenvFlow.listFiles(options))
-            .to.not.include('.env.local');
-        });
+        it("doesn't list `.env.local`'s alternate file", () => {
+          mockFS({
+            '/path/to/project/.env/env': 'DEFAULT_ENV_VAR=ok',
+            '/path/to/project/.env/local/env': 'LOCAL_ENV_VAR=ok',
+            '/path/to/project/.env/env.test': 'DEVELOPMENT_ENV_VAR=ok',
+            '/path/to/project/.env/local/env.test': 'LOCAL_DEVELOPMENT_ENV_VAR=ok'
+          });
 
-        it('lists `.env*` files in the "environment cascade" order', () => {
           expect(dotenvFlow.listFiles(options))
             .to.have.ordered.members([
-              '.env/env',
-              '.env/env.test',
-              '.env/local/env.test'
-            ]);
+              '/path/to/project/.env/env',
+              '/path/to/project/.env/env.test',
+              '/path/to/project/.env/local/env.test'
+            ])
+            .and.not.include('/path/to/project/.env/local/env');
         });
       });
     });
 
-    describe('when `options.pattern` is set to ".env/[.node_env/].env[.node_env][.local]"', () => {
+    describe('when `options.pattern` is set to ".env/[node_env/].env[.node_env][.local]"', () => {
       let options;
 
       beforeEach('setup `options.pattern`', () => {
@@ -285,79 +446,118 @@ describe('dotenv-flow (API)', () => {
         };
       });
 
-      describe('and no `node_env` option is given', () => {
+      describe('… and no `options.node_env` is given', () => {
         it('lists `.env/.env` as a default `.env` file', () => {
+          mockFS({
+            '/path/to/project/.env/.env': 'DEFAULT_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env/.env');
+            .to.include('/path/to/project/.env/.env');
         });
 
-        it('lists `.env/env.local` as `.env.local` file', () => {
+        it('lists `.env/.env.local` as `.env.local` file', () => {
+          mockFS({
+            '/path/to/project/.env/.env.local': 'LOCAL_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env/.env.local');
+            .to.include('/path/to/project/.env/.env.local');
         });
 
-        it('lists `.env*` files in the "environment cascade" order', () => {
+        it('lists files in the order of ascending priority', () => {
+          mockFS({
+            '/path/to/project/.env/.env': 'DEFAULT_ENV_VAR=ok',
+            '/path/to/project/.env/.env.local': 'LOCAL_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
             .to.have.ordered.members([
-              '.env/.env',
-              '.env/.env.local'
+              '/path/to/project/.env/.env',
+              '/path/to/project/.env/.env.local'
             ]);
         });
       });
 
-      describe('and the `node_env` option is given', () => {
+      describe('… and `options.node_env` is given', () => {
         beforeEach('setup `.options.node_env`', () => {
           options.node_env = 'development';
         });
 
         it('lists `.env/.env` as a default `.env` file', () => {
+          mockFS({
+            '/path/to/project/.env/.env': 'DEFAULT_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env/.env');
+            .to.include('/path/to/project/.env/.env');
         });
 
         it('lists `.env/.env.local` as `.env.local` file', () => {
+          mockFS({
+            '/path/to/project/.env/.env.local': 'LOCAL_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env/.env.local');
+            .to.include('/path/to/project/.env/.env.local');
         });
 
-        it('lists `.env/development/.env.development` as a "node_env-specific" file', () => {
+        it('lists `.env/<node_env>/.env.<node_env>` as a "node_env-specific" file', () => {
+          mockFS({
+            '/path/to/project/.env/development/.env.development': 'DEVELOPMENT_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env/development/.env.development');
+            .to.include('/path/to/project/.env/development/.env.development');
         });
 
-        it('lists `.env/development/.env.development.local` as a local "node_env-specific" file', () => {
+        it('lists `.env/<node_env>/.env.<node_env>.local` as a local "node_env-specific" file', () => {
+          mockFS({
+            '/path/to/project/.env/development/.env.development.local': 'LOCAL_DEVELOPMENT_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env/development/.env.development.local');
+            .to.include('/path/to/project/.env/development/.env.development.local');
         });
 
-        it('lists `.env*` files in the "environment cascade" order', () => {
+        it('lists files in the order of ascending priority', () => {
+          mockFS({
+            '/path/to/project/.env/.env': 'DEFAULT_ENV_VAR=ok',
+            '/path/to/project/.env/.env.local': 'LOCAL_ENV_VAR=ok',
+            '/path/to/project/.env/development/.env.development': 'DEVELOPMENT_ENV_VAR=ok',
+            '/path/to/project/.env/development/.env.development.local': 'LOCAL_DEVELOPMENT_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
             .to.have.ordered.members([
-              '.env/.env',
-              '.env/.env.local',
-              '.env/development/.env.development',
-              '.env/development/.env.development.local'
+              '/path/to/project/.env/.env',
+              '/path/to/project/.env/.env.local',
+              '/path/to/project/.env/development/.env.development',
+              '/path/to/project/.env/development/.env.development.local'
             ]);
         });
       });
 
-      describe('and the `node_env` option is set to "test"', () => {
+      describe('… and `options.node_env` is set to "test"', () => {
         beforeEach('set `.options.node_env` to "test"', () => {
           options.node_env = 'test';
         });
 
-        it("doesn't list the `.env.local` file", () => {
-          expect(dotenvFlow.listFiles(options))
-            .to.not.include('.env.local');
-        });
+        it("doesn't list `.env.local`'s alternate file", () => {
+          mockFS({
+            '/path/to/project/.env/.env': 'DEFAULT_ENV_VAR=ok',
+            '/path/to/project/.env/.env.local': 'LOCAL_ENV_VAR=ok',
+            '/path/to/project/.env/test/.env.test': 'TEST_ENV_VAR=ok',
+            '/path/to/project/.env/test/.env.test.local': 'LOCAL_TEST_ENV_VAR=ok'
+          });
 
-        it('lists `.env*` files in the "environment cascade" order', () => {
           expect(dotenvFlow.listFiles(options))
             .to.have.ordered.members([
-              '.env/.env',
-              '.env/test/.env.test',
-              '.env/test/.env.test.local'
-            ]);
+              '/path/to/project/.env/.env',
+              '/path/to/project/.env/test/.env.test',
+              '/path/to/project/.env/test/.env.test.local'
+            ])
+            .and.not.include('/path/to/project/.env/.env.local');
         });
       });
     });
@@ -369,64 +569,104 @@ describe('dotenv-flow (API)', () => {
         options = { pattern: '.env[.local]' };
       });
 
-      describe('and no `node_env` option is given', () => {
+      describe('… and no `options.node_env` is given', () => {
         it('lists the default `.env` file', () => {
+          mockFS({
+            '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env');
+            .to.include('/path/to/project/.env');
         });
 
         it('lists the `.env.local` file', () => {
+          mockFS({
+            '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env.local');
+            .to.include('/path/to/project/.env.local');
         });
 
-        it('lists `.env*` files in the "environment cascade" order', () => {
+        it('lists files in the order of ascending priority', () => {
+          mockFS({
+            '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+            '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
             .to.have.ordered.members([
-              '.env',
-              '.env.local'
+              '/path/to/project/.env',
+              '/path/to/project/.env.local'
             ]);
         });
       });
 
-      describe('and the `node_env` option is given', () => {
+      describe('… and `options.node_env` is given', () => {
         beforeEach('setup `.options.node_env`', () => {
           options.node_env = 'development';
         });
 
         it('lists the default `.env` file', () => {
+          mockFS({
+            '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env');
+            .to.include('/path/to/project/.env');
         });
 
         it('lists the `env.local` file', () => {
+          mockFS({
+            '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env.local');
+            .to.include('/path/to/project/.env.local');
         });
 
-        it("doesn't list any \"node_env-specific\" files", () => {
+        it(`doesn't list any "node_env-specific" files`, () => {
+          mockFS({
+            '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+            '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok',
+            '/path/to/project/.env.development': 'DEVELOPMENT_ENV_VAR=ok',
+            '/path/to/project/.env.development.local': 'LOCAL_DEVELOPMENT_ENV_VAR=ok'
+          });
+
           for (const filename of dotenvFlow.listFiles(options)) {
             expect(filename).to.not.include('development');
           }
         });
 
-        it('lists `.env*` files in the "environment cascade" order', () => {
+        it('lists files in the order of ascending priority', () => {
+          mockFS({
+            '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+            '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
             .to.have.ordered.members([
-              '.env',
-              '.env.local'
+              '/path/to/project/.env',
+              '/path/to/project/.env.local'
             ]);
         });
       });
 
-      describe('and the `node_env` option is set to "test"', () => {
+      describe('… and `options.node_env` is set to "test"', () => {
         beforeEach('set `.options.node_env` to "test"', () => {
           options.node_env = 'test';
         });
 
         it('lists only the default `.env` file', () => {
+          mockFS({
+            '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+            '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok',
+            '/path/to/project/.env.test': 'TEST_ENV_VAR=ok',
+            '/path/to/project/.env.test.local': 'LOCAL_TEST_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.deep.equal(['.env']);
+            .to.deep.equal(['/path/to/project/.env']);
         });
       });
     });
@@ -438,60 +678,89 @@ describe('dotenv-flow (API)', () => {
         options = { pattern: '.env[.node_env]' };
       });
 
-      describe('and no `node_env` option is given', () => {
+      describe('… and no `options.node_env` is given', () => {
         it('lists only the default `.env` file', () => {
+          mockFS({
+            '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+            '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.deep.equal(['.env']);
+            .to.deep.equal(['/path/to/project/.env']);
         });
       });
 
-      describe('and the `node_env` option is given', () => {
+      describe('… and `options.node_env` is given', () => {
         beforeEach('setup `.options.node_env`', () => {
           options.node_env = 'development';
         });
 
         it('lists the default `.env` file', () => {
+          mockFS({
+            '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env');
+            .to.include('/path/to/project/.env');
         });
 
         it('lists the "node_env-specific" file', () => {
+          mockFS({
+            '/path/to/project/.env.development': 'DEVELOPMENT_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
-            .to.include('.env.development');
+            .to.include('/path/to/project/.env.development');
         });
 
         it("doesn't list any `.local` files", () => {
+          mockFS({
+            '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+            '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok',
+            '/path/to/project/.env.development': 'DEVELOPMENT_ENV_VAR=ok',
+            '/path/to/project/.env.development.local': 'LOCAL_DEVELOPMENT_ENV_VAR=ok'
+          });
+
           for (const filename of dotenvFlow.listFiles(options)) {
             expect(filename).to.not.include('local');
           }
         });
 
-        it('lists `.env*` files in the "environment cascade" order', () => {
+        it('lists files in the order of ascending priority', () => {
+          mockFS({
+            '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+            '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok',
+            '/path/to/project/.env.development': 'DEVELOPMENT_ENV_VAR=ok',
+            '/path/to/project/.env.development.local': 'LOCAL_DEVELOPMENT_ENV_VAR=ok'
+          });
+
           expect(dotenvFlow.listFiles(options))
             .to.have.ordered.members([
-              '.env',
-              '.env.development'
+              '/path/to/project/.env',
+              '/path/to/project/.env.development'
             ]);
         });
       });
+    });
 
-      describe('and the `node_env` option is set to "test"', () => {
-        beforeEach('set `.options.node_env` to "test"', () => {
-          options.node_env = 'test';
+    describe('when `options.path` is given', () => {
+      let options;
+
+      beforeEach('setup `options.pattern`', () => {
+        options = { path: '/path/to/another/project' };
+      });
+
+      it('uses the given `options.path` as a working directory', () => {
+        mockFS({
+          '/path/to/another/project/.env': 'DEFAULT_ENV_VAR=ok',
+          '/path/to/another/project/.env.local': 'LOCAL_ENV_VAR=ok'
         });
 
-        it("doesn't list the `.env.local` file", () => {
-          expect(dotenvFlow.listFiles(options))
-            .to.not.include('.env.local');
-        });
-
-        it('lists `.env*` files in the "environment cascade" order', () => {
-          expect(dotenvFlow.listFiles(options))
-            .to.have.ordered.members([
-              '.env',
-              '.env.test'
-            ]);
-        });
+        expect(dotenvFlow.listFiles(options))
+          .to.deep.equal([
+            '/path/to/another/project/.env',
+            '/path/to/another/project/.env.local'
+          ]);
       });
     });
   });
@@ -1151,7 +1420,7 @@ describe('dotenv-flow (API)', () => {
         options = { path: '/path/to/another/project' };
       });
 
-      it('uses the given `options.path` as working directory', () => {
+      it('uses the given `options.path` as a working directory', () => {
         mockFS({
           '/path/to/another/project/.env': 'DEFAULT_ENV_VAR=ok',
           '/path/to/another/project/.env.local': 'LOCAL_ENV_VAR=ok'
