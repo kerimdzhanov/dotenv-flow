@@ -39,6 +39,7 @@ Using PNPM:
 $ pnpm add dotenv-flow
 ```
 
+
 ## Usage
 
 As early as possible in your Node.js app, initialize **dotenv-flow**:
@@ -297,7 +298,9 @@ Then at every place `.env` is mentioned in the docs, read it as: "`.env.defaults
 
 ## `dotenv-flow/config` options
 
-When preloading **dotenv-flow** using the node's `-r` switch you can use the following configuration options:
+The following configuration options can be used when:
+  a) preloading **dotenv-flow** using Node's `-r` (`[ts-]node --require`) switch, or…
+  b) `import`ing the `dotenv-flow/config` entry point.
 
 ### Environment variables
 
@@ -306,8 +309,10 @@ When preloading **dotenv-flow** using the node's `-r` switch you can use the fol
 * `DOTENV_FLOW_PATH` => [`options.path`](#optionspath);
 * `DOTENV_FLOW_ENCODING` => [`options.encoding`](#optionsencoding);
 * `DOTENV_FLOW_PURGE_DOTENV` => [`options.purge_dotenv`](#optionspurge_dotenv);
+* `DOTENV_FLOW_DEBUG` => [`options.debug`](#optionsdebug);
 * `DOTENV_FLOW_SILENT` => [`options.silent`](#optionssilent);
 
+##### _for example:_
 ```sh
 $ NODE_ENV=production DOTENV_FLOW_PATH=/path/to/env-files-dir node -r dotenv-flow/config your_script.js
 ```
@@ -319,12 +324,14 @@ $ NODE_ENV=production DOTENV_FLOW_PATH=/path/to/env-files-dir node -r dotenv-flo
 * `--dotenv-flow-path` => [`options.path`](#optionspath);
 * `--dotenv-flow-encoding` => [`options.encoding`](#optionsencoding);
 * `--dotenv-flow-purge-dotenv` => [`options.purge_dotenv`](#optionspurge_dotenv);
+* `--dotenv-flow-debug` => [`options.debug`](#optionsdebug);
 * `--dotenv-flow-silent` => [`options.silent`](#optionssilent);
 
-Don't forget to separate **dotenv-flow/config**-specific CLI switches with `--` because they are not recognized by **Node.js**:
+> Make sure that **dotenv-flow/config**-specific CLI switches are separated from Node's by `--` (double dash) since they are not recognized by **Node.js**.
 
+##### _for example:_
 ```sh
-$ node -r dotenv-flow/config your_script.js -- --dotenv-flow-encoding=latin1 --dotenv-flow-path=...
+$ node --require dotenv-flow/config your_script.js -- --dotenv-flow-path=/path/to/project --dotenv-flow-encoding=base64
 ```
 
 
@@ -332,9 +339,13 @@ $ node -r dotenv-flow/config your_script.js -- --dotenv-flow-encoding=latin1 --d
 
 #### `.config([options]) => object`
 
-The main entry point function that parses the contents of your `.env*` files, merges the results and appends to `process.env.*`.
+"dotenv-flow" initialization function (API entry point).
 
-Also, like the original module ([dotenv](https://github.com/motdotla/dotenv)), it returns an `object` with the `parsed` property containing the resulting key/values or the `error` property if the initialization is failed.
+Allows configuring dotenv-flow programmatically.
+
+Also, like the original module ([dotenv](https://github.com/motdotla/dotenv)),
+it returns an `object` with `.parsed` property containing the resulting
+`varname => values` pairs or `.error` property if the initialization is failed.
 
 ##### `options.node_env`
 ###### Type: `string`
@@ -478,11 +489,17 @@ require('dotenv-flow').config({
 });
 ```
 
+##### `options.debug`
+###### Type: `boolean`
+###### Default: `false`
+
+Enables detailed logging to debug why certain variables are not being set as you expect.
+
 ##### `options.silent`
 ###### Type: `boolean`
 ###### Default: `false`
 
-With this option you can suppress all the console outputs except errors and deprecation warnings.
+Suppresses all kinds of warnings including ".env*" files' loading errors.
 
 ```js
 require('dotenv-flow').config({
@@ -492,16 +509,19 @@ require('dotenv-flow').config({
 
 ---
 
-The following API considered as internal, but it is also exposed to give the ability to be used programmatically by your own needs.
+The following API is considered as internal, although it's exposed
+for programmatic use of **dotenv-flow** for your own project-specific needs.
 
 
 #### `.listFiles([options]) => string[]`
 
-Returns a list of `.env*` filenames depending on the given `options`.
+Returns a list of existing `.env*` filenames depending on the given `options`.
 
 The resulting list is ordered by the env files'
 variables overwriting priority from lowest to highest.
-This is also referenced as "env files' environment cascade."
+
+This can also be referenced as "env files' environment cascade"
+or "order of ascending priority."
 
 ⚠️ Note that the `.env.local` file is not listed for "test" environment,
 since normally you expect tests to produce the same results for everyone.
@@ -568,6 +588,13 @@ which (as mentioned above) will exclude `.env.local` producing just a single:
 … since normally we expect tests to produce the same results for everyone.
 
 
+##### `options.debug`
+###### Type: `boolean`
+###### Default: `false`
+
+Enables debug messages.
+
+
 ##### Returns:
 
 ###### Type: `string[]`
@@ -605,11 +632,19 @@ When several filenames are given, the parsed variables are merged into a single 
 
 A filename or a list of filenames to parse.
 
+
 ##### `options.encoding`
 ###### Type: `string`
 ###### Default: `"utf8"`
 
 An optional encoding for reading files.
+
+
+##### `options.debug`
+###### Type: `boolean`
+###### Default: `false`
+
+Enables debug messages.
 
 
 ##### Returns:
@@ -667,11 +702,17 @@ A filename or a list of filenames to load.
 
 An optional encoding for reading files.
 
+##### `options.debug`
+###### Type: `boolean`
+###### Default: `false`
+
+Optionally, turn on debug messages.
+
 ##### `options.silent`
 ###### Type: `boolean`
 ###### Default: `false`
 
-Suppress all the console outputs except errors and deprecation warnings.
+If enabled, suppresses all kinds of warnings including ".env*" files' loading errors.
 
 ##### Returns:
 

@@ -11,7 +11,8 @@ describe('env_options', () => {
       DOTENV_FLOW_PATH: '/path/to/project',
       DOTENV_FLOW_ENCODING: 'latin1',
       DOTENV_FLOW_PURGE_DOTENV: 'yes',
-      DOTENV_FLOW_SILENT: 'yes'
+      DOTENV_FLOW_DEBUG: 'enabled',
+      DOTENV_FLOW_SILENT: 'true'
     }))
       .to.deep.equal({
         node_env: 'production',
@@ -19,7 +20,8 @@ describe('env_options', () => {
         path: '/path/to/project',
         encoding: 'latin1',
         purge_dotenv: 'yes',
-        silent: 'yes'
+        debug: 'enabled',
+        silent: 'true'
       });
   });
 

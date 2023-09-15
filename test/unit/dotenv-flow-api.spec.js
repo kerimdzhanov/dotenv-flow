@@ -920,18 +920,6 @@ describe('dotenv-flow (API)', () => {
         });
     });
 
-    it('warns about predefined variable is not being overwritten', () => {
-      process.env.DEFAULT_ENV_VAR = 'predefined';
-
-      dotenvFlow.load([
-        '/path/to/project/.env',
-        '/path/to/project/.env.development'
-      ]);
-
-      expect(console.warn)
-        .to.have.been.calledWithMatch(/^dotenv-flow: .*%s.+/, 'DEFAULT_ENV_VAR');
-    });
-
     describe('when `options.encoding` is given', () => {
       let options;
 
@@ -953,58 +941,56 @@ describe('dotenv-flow (API)', () => {
       });
     });
 
-    describe('when `options.silent` is enabled', () => {
-      let options;
-
-      beforeEach('setup `options.encoding`', () => {
-        options = { silent: true };
-      });
-
-      it('suppresses the "predefined environment variable" warning', () => {
-        process.env.DEFAULT_ENV_VAR = 'predefined';
-
-        dotenvFlow.load([
-          '/path/to/project/.env',
-          '/path/to/project/.env.development',
-        ], options);
-
-        expect(console.warn)
-          .to.have.not.been.called;
-      });
-    });
-
-    describe('if an error is occurred during the parsing', () => {
+    describe('if parsing is failed', () => {
       beforeEach('stub `fs.readFileSync` error', () => {
         $fs_readFileSync
           .withArgs('/path/to/project/.env.local')
           .throws(new Error('`.env.local` file reading error stub'));
       });
 
-      it('leaves `process.env` untouched (does not assign any variables)', () => {
-        const processEnvCopy = { ...process.env };
+      let filenames;
 
-        dotenvFlow.load([
+      beforeEach('setup `filenames` for loading', () => {
+        filenames = [
           '/path/to/project/.env',
           '/path/to/project/.env.local', // << the mocked error filename
           '/path/to/project/.env.development'
-        ]);
+        ];
+      });
+
+      it('leaves `process.env` untouched (does not assign any variables)', () => {
+        const processEnvCopy = { ...process.env };
+
+        dotenvFlow.load(filenames);
 
         expect(process.env)
-            .to.deep.equal(processEnvCopy);
+          .to.deep.equal(processEnvCopy);
       });
 
       it('returns the occurred error within the `.error` property', () => {
-        const result = dotenvFlow.load([
-          '/path/to/project/.env',
-          '/path/to/project/.env.local',
-          '/path/to/project/.env.development'
-        ]);
+        const result = dotenvFlow.load(filenames);
 
         expect(result)
           .to.be.an('object')
           .with.property('error')
           .that.is.an('error')
           .with.property('message', '`.env.local` file reading error stub');
+      });
+
+      it('warns about the occurred error', () => {
+        dotenvFlow.load(filenames);
+
+        expect(console.warn)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*`\.env\.local` file reading error stub/
+          );
+      });
+
+      it("doesn't warn when suppressed by `options.silent`", () => {
+        dotenvFlow.load(filenames, { silent: true });
+
+        expect(console.warn)
+          .to.have.not.been.called;
       });
     });
   });
@@ -1570,34 +1556,437 @@ describe('dotenv-flow (API)', () => {
       });
     });
 
-    describe('when `options.silent` is enabled', () => {
+    describe('when `options.debug` is enabled', () => {
       let options;
 
-      beforeEach('setup `options.purge_dotenv`', () => {
-        options = { silent: true };
+      beforeEach('setup `options.debug`', () => {
+        options = {
+          debug: true
+        };
       });
 
-      beforeEach("setup `.env*` files' contents", () => {
+      beforeEach('stub `console.debug`', () => {
+        sinon.stub(console, 'debug');
+      });
+
+      afterEach('restore `console.debug`', () => {
+        console.debug.restore();
+      });
+
+      beforeEach("stub `.env*` files' contents", () => {
         mockFS({
           '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok'
         });
       });
 
-      beforeEach('stub `console.warn`', () => {
-        sinon.stub(console, 'warn');
+      it('prints out initialization options [0]', () => {
+        dotenvFlow.config(options);
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(/dotenv-flow\b.*init/);
+
+        expect(console.debug)
+          .to.have.not.been.calledWithMatch(/dotenv-flow\b.*options\./);
       });
 
-      afterEach('restore `console.warn`', () => {
-        console.warn.restore();
+      it('prints out initialization options [1]', () => {
+        dotenvFlow.config({
+          ...options,
+          node_env: 'development'
+        });
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(/dotenv-flow\b.*init/);
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch('options.node_env', 'development');
       });
 
-      it('suppresses all the warnings', () => {
+      it('prints out initialization options [2]', () => {
+        dotenvFlow.config({
+          ...options,
+          node_env: 'production',
+          default_node_env: 'development'
+        });
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(/dotenv-flow\b.*init/);
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch('options.node_env', 'production');
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch('options.default_node_env', 'development');
+      });
+
+      it('prints out initialization options [3]', () => {
+        process.env.NODE_ENV = 'test';
+
+        dotenvFlow.config({
+          ...options,
+          node_env: 'production',
+          default_node_env: 'development',
+          path: '/path/to/project',
+          pattern: '.env[.node_env][.local]',
+          encoding: 'utf8',
+          purge_dotenv: false,
+          silent: false,
+        });
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(/dotenv-flow\b.*init/);
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch('options.node_env', "production");
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch('options.default_node_env', "development");
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch('options.path', '/path/to/project');
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch('options.pattern', '.env[.node_env][.local]');
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch('options.encoding', 'utf8');
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch('options.purge_dotenv', false);
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch('options.silent', false);
+      });
+
+      it('prints out effective node_env set by `options.node_env`', () => {
+        dotenvFlow.config({
+          ...options,
+          node_env: 'production'
+        });
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*operating in "production" environment.*`options\.node_env`/
+          );
+      });
+
+      it('prints out effective node_env set by `process.env.NODE_ENV`', () => {
+        process.env.NODE_ENV = 'test';
+
+        dotenvFlow.config(options);
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*operating in "test" environment.*`process\.env\.NODE_ENV`/
+          );
+      });
+
+      it('prints out effective node_env taken from `options.default_node_env`', () => {
+        dotenvFlow.config({
+          ...options,
+          default_node_env: 'development'
+        });
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*operating in "development" environment.*`options\.default_node_env`/
+          );
+      });
+
+      it('notifies about operating in "no environment" mode when none of the related options is set', () => {
+        dotenvFlow.config(options);
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*operating in "no environment" mode/
+          );
+      });
+
+      it('prints out the list of effective `.env*` files', () => {
+        mockFS({
+          '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+          '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok',
+          '/path/to/project/.env.development': 'DEVELOPMENT_ENV_VAR=ok',
+          '/path/to/project/.env.development.local': 'LOCAL_DEVELOPMENT_ENV_VAR=ok'
+        });
+
+        dotenvFlow.config({
+          ...options,
+          node_env: 'development'
+        });
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*>> %s/,
+            /^\/path\/to\/project\/\.env$/
+          );
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*>> %s/,
+            /^\/path\/to\/project\/\.env\.local$/
+          );
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*>> %s/,
+            /^\/path\/to\/project\/\.env\.development$/
+          );
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*>> %s/,
+            /^\/path\/to\/project\/\.env\.development\.local$/
+          );
+      });
+
+      it('prints out parsing files', () => {
+        mockFS({
+          '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+          '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok',
+          '/path/to/project/.env.development': 'DEVELOPMENT_ENV_VAR=ok',
+          '/path/to/project/.env.development.local': 'LOCAL_DEVELOPMENT_ENV_VAR=ok'
+        });
+
+        dotenvFlow.config({
+          ...options,
+          node_env: 'development'
+        });
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*parsing.*%s/,
+            /^\/path\/to\/project\/\.env$/
+          );
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*parsing.*%s/,
+            /^\/path\/to\/project\/\.env\.local$/
+          );
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*parsing.*%s/,
+            /^\/path\/to\/project\/\.env\.development$/
+          );
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*parsing.*%s/,
+            /^\/path\/to\/project\/\.env\.development\.local$/
+          );
+      });
+
+      it('prints out parsed environment variables', () => {
+        mockFS({
+          '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+          '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok',
+          '/path/to/project/.env.development': 'DEVELOPMENT_ENV_VAR=ok',
+          '/path/to/project/.env.development.local': 'LOCAL_DEVELOPMENT_ENV_VAR=ok'
+        });
+
+        dotenvFlow.config({
+          ...options,
+          node_env: 'development'
+        });
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*>> %s/,
+            'DEFAULT_ENV_VAR'
+          );
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*> %s/,
+            'LOCAL_ENV_VAR'
+          );
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*> %s/,
+            'DEVELOPMENT_ENV_VAR'
+          );
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*> %s/,
+            'LOCAL_DEVELOPMENT_ENV_VAR'
+          );
+      });
+
+      it('prints out environment variables assigned to `process.env`', () => {
+        mockFS({
+          '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+          '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok',
+          '/path/to/project/.env.development': 'DEVELOPMENT_ENV_VAR=ok',
+          '/path/to/project/.env.development.local': 'LOCAL_DEVELOPMENT_ENV_VAR=ok'
+        });
+
+        dotenvFlow.config({
+          ...options,
+          node_env: 'development'
+        });
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*merging.*variables.*`process.env`/
+          );
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*>> process\.env\.%s/,
+            'DEFAULT_ENV_VAR'
+          );
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*>> process\.env\.%s/,
+            'LOCAL_ENV_VAR'
+          );
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*>> process\.env\.%s/,
+            'DEVELOPMENT_ENV_VAR'
+          );
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*>> process\.env\.%s/,
+            'LOCAL_DEVELOPMENT_ENV_VAR'
+          );
+      });
+
+      it('informs when merging with overwrites', () => {
+        mockFS({
+          '/path/to/project/.env': (
+              'DEFAULT_ENV_VAR=ok\n' +
+              'SHARED_ENV_VAR=1'
+          ),
+          '/path/to/project/.env.local': (
+              'LOCAL_ENV_VAR=ok\n' +
+              'SHARED_ENV_VAR=2'
+          ),
+          '/path/to/project/.env.development': (
+              'DEVELOPMENT_ENV_VAR=ok\n' +
+              'SHARED_ENV_VAR=3'
+          ),
+          '/path/to/project/.env.development.local': (
+              'LOCAL_DEVELOPMENT_ENV_VAR=ok\n' +
+              'SHARED_ENV_VAR=4'
+          )
+        });
+
+        dotenvFlow.config({
+          ...options,
+          node_env: 'development'
+        });
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*%s.*overwritten by.*%s/,
+            'SHARED_ENV_VAR',
+            /^\/path\/to\/project\/\.env\.local$/
+          );
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*%s.*overwritten by.*%s/,
+            'SHARED_ENV_VAR',
+            /^\/path\/to\/project\/\.env\.development$/
+          );
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*%s.*overwritten by.*%s/,
+            'SHARED_ENV_VAR',
+            /^\/path\/to\/project\/\.env\.development\.local$/
+          );
+      });
+
+      it('informs when predefined environment variable is not being overwritten', () => {
+        mockFS({
+          '/path/to/project/.env': 'DEFAULT_ENV_VAR="should be predefined"'
+        });
+
         process.env.DEFAULT_ENV_VAR = 'predefined';
 
         dotenvFlow.config(options);
 
-        expect(console.warn)
-          .to.have.not.been.called;
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*%s.*predefined.*not.*overwritten/,
+            'DEFAULT_ENV_VAR'
+          );
+      });
+
+      it('prints out the completion status', () => {
+        mockFS({
+          '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok'
+        });
+
+        dotenvFlow.config({
+          ...options,
+          node_env: 'development'
+        });
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(
+            /dotenv-flow\b.*initialization completed/
+          );
+      });
+
+      describe('… and `options.node_env` is set to "test"', () => {
+        beforeEach('set `.options.node_env` to "test"', () => {
+          options.node_env = 'test';
+        });
+
+        it('notifies that `.env.local` is being skipped in "test" environment', () => {
+          mockFS({
+            '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+            '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok',
+            '/path/to/project/.env.test': 'TEST_ENV_VAR=ok',
+            '/path/to/project/.env.test.local': 'LOCAL_TEST_ENV_VAR=ok'
+          });
+
+          dotenvFlow.config(options);
+
+          expect(console.debug)
+            .to.have.been.calledWithMatch(
+              /dotenv-flow\b.*%s.*is being skipped for "test" environment/,
+              '.env.local'
+            );
+        });
+
+        it("doesn't spam about skipping `.env.local` if it doesn't exist", () => {
+          mockFS({
+            '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+            '/path/to/project/.env.test': 'TEST_ENV_VAR=ok',
+            '/path/to/project/.env.test.local': 'LOCAL_TEST_ENV_VAR=ok'
+          });
+
+          dotenvFlow.config(options);
+
+          expect(console.debug)
+            .to.have.not.been.calledWithMatch(/dotenv-flow\b.*%s.*skipped/);
+        });
+      });
+
+      describe('… and `options.purge_dotenv` is enabled', () => {
+        beforeEach('setup `options.purge_dotenv`', () => {
+          options.purge_dotenv = true;
+        });
+
+        it('prints out the "unloading `.env` file" message', () => {
+          dotenvFlow.config(options);
+
+          expect(console.debug)
+            .to.have.been.calledWithMatch(
+              /dotenv-flow\b.*`options\.purge_dotenv`.*unloading.*`\.env`/
+            );
+        });
       });
     });
 
@@ -1613,6 +2002,14 @@ describe('dotenv-flow (API)', () => {
         $fs_readFileSync
           .withArgs('/path/to/project/.env.local')
           .throws(new Error('`.env.local` file reading error stub'));
+      });
+
+      beforeEach('stub `console.warn`', () => {
+        sinon.stub(console, 'warn');
+      });
+
+      afterEach('restore `console.warn`', () => {
+        console.warn.restore();
       });
 
       it("doesn't load any environment variables", () => {
@@ -1633,55 +2030,79 @@ describe('dotenv-flow (API)', () => {
           .that.is.an('error')
           .with.property('message', '`.env.local` file reading error stub');
       });
+
+      it('warns about the occurred error', () => {
+        dotenvFlow.config();
+
+        expect(console.warn)
+          .to.have.been.calledWithMatch(/dotenv-flow\b.*`\.env\.local` file reading error stub/);
+      });
     });
 
     describe('when none of the appropriate ".env*" files is present', () => {
-      it('returns "no `.env*` files" error', () => {
-        const result = dotenvFlow.config();
+      beforeEach('stub `console.warn`', () => {
+        sinon.stub(console, 'warn');
+      });
 
-        expect(result)
-          .to.be.an('object')
-          .with.property('error')
-          .that.is.an('error')
-          .with.property('message')
-          .that.matches(/no "\.env\*" files/);
+      afterEach('restore `console.warn`', () => {
+        console.warn.restore();
       });
 
       describe('… and no "node_env-related" options are set', () => {
-        it('returns an error with a message indicating the working directory', () => {
-          const defaultResult = dotenvFlow.config();
+        it('returns "no `.env*` files" error', () => {
+          const result = dotenvFlow.config();
 
-          expect(defaultResult.error)
-            .to.be.an('error')
+          expect(result)
+            .to.be.an('object')
+            .with.property('error')
+            .that.is.an('error')
             .with.property('message')
-            .that.includes('/path/to/project');
-
-          const pathResult = dotenvFlow.config({
-            path: '/path/to/another/project'
-          });
-
-          expect(pathResult.error)
-            .to.be.an('error')
-            .with.property('message')
-            .that.includes('/path/to/another/project');
+            .that.matches(/no "\.env\*" files/);
         });
 
-        it('returns an error with a message indicating the naming convention pattern', () => {
-          const defaultResult = dotenvFlow.config();
+        it('warns about the "no `.env*` files" error', () => {
+          dotenvFlow.config();
 
-          expect(defaultResult.error)
-            .to.be.an('error')
-            .with.property('message')
-            .that.includes('.env[.node_env][.local]');
+          expect(console.warn)
+            .to.have.been.calledWithMatch(/dotenv-flow\b.*no "\.env\*" files/);
+        });
 
-          const patternResult = dotenvFlow.config({
-            pattern: 'config/[local/].env[.node_env]'
+        describe('the returning error message', () => {
+          it('indicates the working directory', () => {
+            const defaultResult = dotenvFlow.config();
+
+            expect(defaultResult.error)
+              .to.be.an('error')
+              .with.property('message')
+              .that.includes('/path/to/project');
+
+            const pathResult = dotenvFlow.config({
+              path: '/path/to/another/project'
+            });
+
+            expect(pathResult.error)
+              .to.be.an('error')
+              .with.property('message')
+              .that.includes('/path/to/another/project');
           });
 
-          expect(patternResult.error)
-            .to.be.an('error')
-            .with.property('message')
-            .that.includes('config/[local/].env[.node_env]');
+          it('indicates the naming convention pattern', () => {
+            const defaultResult = dotenvFlow.config();
+
+            expect(defaultResult.error)
+              .to.be.an('error')
+              .with.property('message')
+              .that.includes('.env[.node_env][.local]');
+
+            const patternResult = dotenvFlow.config({
+              pattern: 'config/[local/].env[.node_env]'
+            });
+
+            expect(patternResult.error)
+              .to.be.an('error')
+              .with.property('message')
+              .that.includes('config/[local/].env[.node_env]');
+          });
         });
       });
 
@@ -1690,41 +2111,109 @@ describe('dotenv-flow (API)', () => {
           process.env.NODE_ENV = 'development';
         });
 
-        it('returns an error with a message indicating the working directory', () => {
-          const defaultResult = dotenvFlow.config();
+        it('returns "no `.env*` files" error', () => {
+          const result = dotenvFlow.config();
 
-          expect(defaultResult.error)
-            .to.be.an('error')
+          expect(result)
+            .to.be.an('object')
+            .with.property('error')
+            .that.is.an('error')
             .with.property('message')
-            .that.includes('/path/to/project');
-
-          const pathResult = dotenvFlow.config({
-            path: '/path/to/another/project'
-          });
-
-          expect(pathResult.error)
-            .to.be.an('error')
-            .with.property('message')
-            .that.includes('/path/to/another/project');
+            .that.matches(/no "\.env\*" files/);
         });
 
-        it('returns an error with a message indicating the naming convention pattern for the specified node_env', () => {
-          const defaultResult = dotenvFlow.config();
+        it('warns about the "no `.env*` files" error', () => {
+          dotenvFlow.config();
 
-          expect(defaultResult.error)
-            .to.be.an('error')
-            .with.property('message')
-            .that.includes('.env[.development][.local]');
+          expect(console.warn)
+            .to.have.been.calledWithMatch(/dotenv-flow\b.*no "\.env\*" files/);
+        });
 
-          const patternResult = dotenvFlow.config({
-            pattern: 'config/[local/].env[.node_env]'
+        describe('the returning error message', () => {
+          it('indicates the working directory', () => {
+            const defaultResult = dotenvFlow.config();
+
+            expect(defaultResult.error)
+              .to.be.an('error')
+              .with.property('message')
+              .that.includes('/path/to/project');
+
+            const pathResult = dotenvFlow.config({
+              path: '/path/to/another/project'
+            });
+
+            expect(pathResult.error)
+              .to.be.an('error')
+              .with.property('message')
+              .that.includes('/path/to/another/project');
           });
 
-          expect(patternResult.error)
-            .to.be.an('error')
-            .with.property('message')
-            .that.includes('config/[local/].env[.development]');
+          it('indicates the naming convention pattern for the specified node_env', () => {
+            const defaultResult = dotenvFlow.config();
+
+            expect(defaultResult.error)
+              .to.be.an('error')
+              .with.property('message')
+              .that.includes('.env[.development][.local]');
+
+            const patternResult = dotenvFlow.config({
+              pattern: 'config/[local/].env[.node_env]'
+            });
+
+            expect(patternResult.error)
+              .to.be.an('error')
+              .with.property('message')
+              .that.includes('config/[local/].env[.development]');
+          });
         });
+      });
+    });
+
+    describe('when `options.silent` is enabled', () => {
+      let options;
+
+      beforeEach('setup `options.silent`', () => {
+        options = { silent: true };
+      });
+
+      beforeEach('stub `console.warn`', () => {
+        sinon.stub(console, 'warn');
+      });
+
+      afterEach('restore `console.warn`', () => {
+        console.warn.restore();
+      });
+
+      it("doesn't warn if parsing is failed", () => {
+        mockFS({
+          '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+          '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok'
+        });
+
+        $fs_readFileSync
+          .withArgs('/path/to/project/.env.local')
+          .throws(new Error('`.env.local` file reading error stub'));
+
+        const result = dotenvFlow.config(options);
+
+        expect(console.warn)
+          .to.have.not.been.called;
+
+        expect(result.error)
+          .to.be.an('error')
+          .with.property('message', '`.env.local` file reading error stub');
+      });
+
+      it("doesn't warn about missing `.env*` files", () => {
+        const result = dotenvFlow.config(options);
+
+        expect(console.warn)
+          .to.have.not.been.called;
+
+        expect(result.error)
+          .to.be.an('error')
+          .with.property('message')
+          .that.matches(/no "\.env\*" files/);
       });
     });
   });
