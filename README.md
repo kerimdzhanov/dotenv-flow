@@ -8,7 +8,7 @@
 
 It allows your app to have multiple environments _(like "development", "test", "stage", and "production" respectively)_ with selectively-adjusted environment variable setups and load them dynamically depending on the current `NODE_ENV`.
 
-In addition to that, `.env*.local` overrides adds the ability to overwite variables locally for development, testing, and debugging purposes
+In addition to that, `.env*.local` overrides add the ability to overwrite variables locally for development, testing, and debugging purposes
 _(note that the appropriate `.env*.local` entry should be added to your `.gitignore`)_.
 
 🌱 Inspired by _Ruby's **dotenv** (a.k.a. `dotenv-rails`) gem_, _CreateReactApp's **storing configs in `.env*` files** approach_,
@@ -307,6 +307,7 @@ The following configuration options can be used when:
 * `NODE_ENV` => [`options.node_env`](#optionsnode_env);
 * `DEFAULT_NODE_ENV` => [`options.default_node_env`](#optionsdefault_node_env);
 * `DOTENV_FLOW_PATH` => [`options.path`](#optionspath);
+* `DOTENV_FLOW_PATTERN` => [`options.pattern`](#optionspattern);
 * `DOTENV_FLOW_ENCODING` => [`options.encoding`](#optionsencoding);
 * `DOTENV_FLOW_PURGE_DOTENV` => [`options.purge_dotenv`](#optionspurge_dotenv);
 * `DOTENV_FLOW_DEBUG` => [`options.debug`](#optionsdebug);
@@ -322,6 +323,7 @@ $ NODE_ENV=production DOTENV_FLOW_PATH=/path/to/env-files-dir node -r dotenv-flo
 * `--node-env` => [`options.node_env`](#optionsnode_env);
 * `--default-node-env` => [`options.default_node_env`](#optionsdefault_node_env);
 * `--dotenv-flow-path` => [`options.path`](#optionspath);
+* `--dotenv-flow-pattern` => [`options.pattern`](#optionspattern);
 * `--dotenv-flow-encoding` => [`options.encoding`](#optionsencoding);
 * `--dotenv-flow-purge-dotenv` => [`options.purge_dotenv`](#optionspurge_dotenv);
 * `--dotenv-flow-debug` => [`options.debug`](#optionsdebug);
