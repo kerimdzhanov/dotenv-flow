@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "CommonJS",
+    "noEmit": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strict": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "types": ["node"]
+  },
+  "files": [
+    "lib/dotenv-flow.d.ts",
+    "test/types/dotenv-flow.ts"
+  ]
+}
