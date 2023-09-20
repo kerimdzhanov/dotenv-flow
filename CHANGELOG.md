@@ -1,3 +1,17 @@
+# [3.3.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v3.2.0...v3.3.0) (2023-08-26)
+
+
+### Features
+
+* **dotenv-flow:** Add "exports" field ([352888b](https://github.com/kerimdzhanov/dotenv-flow/commit/352888b374c6ef3a1e7cd80d8882f15a8aa20c0f)), closes [#56](https://github.com/kerimdzhanov/dotenv-flow/issues/56)
+* **dotenv:** upgrade dotenv to v8.6.0 ([69d9273](https://github.com/kerimdzhanov/dotenv-flow/commit/69d9273c299e3ead2a33c6c43114dccd66406ec7))
+
+### Bug Fixes
+
+* **dotenv-flow:config:** load the rest of `.env*` files even if `.env` doesn't exist ([07502e3](https://github.com/kerimdzhanov/dotenv-flow/commit/07502e373bd868ad086940576bdf4ecc1f768685)), closes [#50](https://github.com/kerimdzhanov/dotenv-flow/issues/50)
+
+
+
 # [3.2.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v3.1.0...v3.2.0) (2020-06-27)
 
 

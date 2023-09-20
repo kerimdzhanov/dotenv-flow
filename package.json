@@ -1,6 +1,6 @@
 {
   "name": "dotenv-flow",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "Loads environment variables from `.env.[development|test|production][.local]` files",
   "keywords": [
     "dotenv",
@@ -19,9 +19,12 @@
     "url": "https://github.com/kerimdzhanov/dotenv-flow/issues"
   },
   "main": "lib/dotenv-flow.js",
+  "types": "lib/dotenv-flow.d.ts",
   "exports": {
     ".": "./lib/dotenv-flow.js",
-    "./config": "./config.js",
+    "./config": {
+      "require": "./config.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -33,18 +36,23 @@
     "dotenv": "^16.0.0"
   },
   "devDependencies": {
+    "@types/node": "^20.6.2",
     "chai": "^4.3.7",
-    "conventional-changelog-cli": "^2.0.23",
-    "mocha": "7.2.0",
-    "sinon": "^9.0.2",
-    "sinon-chai": "^3.5.0",
-    "tmp": "^0.2.1"
+    "conventional-changelog-cli": "^2.0.35",
+    "mocha": "^10.2.0",
+    "sinon": "^15.2.0",
+    "sinon-chai": "^3.7.0",
+    "tmp": "^0.2.1",
+    "typescript": "^5.2.2"
   },
   "engines": {
     "node": ">= 8.0.0"
   },
   "scripts": {
-    "test": "mocha -r mocha.conf.js test/{unit,integration}/*.spec.{m,}js",
+    "test": "yarn run test:unit && yarn run test:integration && yarn run test:types",
+    "test:unit": "mocha -r mocha.conf.js test/unit/*.spec.js",
+    "test:integration": "mocha -r mocha.conf.js test/integration/*.spec.{m,}js",
+    "test:types": "tsc",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
   },
   "author": "Dan Kerimdzhanov",

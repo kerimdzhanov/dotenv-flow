@@ -13,7 +13,8 @@ describe('cli_options', () => {
       '--dotenv-flow-path', '/path/to/project',
       '--dotenv-flow-encoding', 'latin1',
       '--dotenv-flow-purge-dotenv', 'yes',
-      '--dotenv-flow-silent', 'yes'
+      '--dotenv-flow-debug', 'enabled',
+      '--dotenv-flow-silent', 'true'
     ]))
       .to.deep.equal({
         node_env: 'production',
@@ -21,7 +22,8 @@ describe('cli_options', () => {
         path: '/path/to/project',
         encoding: 'latin1',
         purge_dotenv: 'yes',
-        silent: 'yes'
+        debug: 'enabled',
+        silent: 'true'
       });
   });
 
@@ -32,17 +34,21 @@ describe('cli_options', () => {
       '--node-env=production',
       '--default-node-env=development',
       '--dotenv-flow-path=/path/to/project',
+      '--dotenv-flow-pattern=config/[local/].env[.node_env]',
       '--dotenv-flow-encoding=latin1',
       '--dotenv-flow-purge-dotenv=yes',
-      '--dotenv-flow-silent=yes'
+      '--dotenv-flow-debug=enabled',
+      '--dotenv-flow-silent=true'
     ]))
       .to.deep.equal({
         node_env: 'production',
         default_node_env: 'development',
         path: '/path/to/project',
+        pattern: 'config/[local/].env[.node_env]',
         encoding: 'latin1',
         purge_dotenv: 'yes',
-        silent: 'yes'
+        debug: 'enabled',
+        silent: 'true'
       });
   });
 

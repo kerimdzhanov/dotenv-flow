@@ -2,19 +2,22 @@
 
 <img src="https://raw.githubusercontent.com/kerimdzhanov/dotenv-flow/master/dotenv-flow@2x.png" alt="dotenv-flow" width="280" height="140" align="right" />
 
-[dotenv](https://github.com/motdotla/dotenv) is a zero-dependency npm module that loads environment variables from a `.env` file into [`process.env`](https://nodejs.org/docs/latest/api/process.html#process_process_env).
+> _[dotenv](https://github.com/motdotla/dotenv) is a zero-dependency npm module that loads environment variables from a `.env` file into [`process.env`](https://nodejs.org/docs/latest/api/process.html#process_process_env)._
 
-**dotenv-flow** extends **dotenv** adding the ability to have multiple `.env*` files like `.env.development`, `.env.test` and `.env.production`, also allowing defined variables to be overwritten individually in the appropriate `.env*.local` file.
+**dotenv-flow** extends _dotenv_, adding support of `NODE_ENV`-specific `.env*` files _like `.env.development`, `.env.test`, `.env.stage`, and `.env.production`,_ and the appropriate `.env*.local` overrides.
 
-Storing configuration in _environment variables_ separate from code and grouping them by environments like _development_, _test_ and _production_ is based on [The Twelve-Factor App](https://12factor.net/config) methodology.
+It allows your app to have multiple environments _(like "development", "test", "stage", and "production" respectively)_ with selectively-adjusted environment variable setups and load them dynamically depending on the current `NODE_ENV`.
 
+In addition to that, `.env*.local` overrides add the ability to overwrite variables locally for development, testing, and debugging purposes
+_(note that the appropriate `.env*.local` entry should be added to your `.gitignore`)_.
+
+🌱 Inspired by _Ruby's **dotenv** (a.k.a. `dotenv-rails`) gem_, _CreateReactApp's **storing configs in `.env*` files** approach_,
+the _Twelve-Factor App methodology_ in general, and _its **[store config in the environment](https://12factor.net/config)** section_ in particular.
+
+[![Build Status](https://github.com/kerimdzhanov/dotenv-flow/actions/workflows/ci.yml/badge.svg?branch=master&event=push)](https://github.com/kerimdzhanov/dotenv-flow/actions/workflows/ci.yml)
 [![npm version](https://badge.fury.io/js/dotenv-flow.svg)](https://badge.fury.io/js/dotenv-flow)
-[![npm downloads](https://badgen.net/npm/dw/dotenv-flow)](https://www.npmjs.com/package/dotenv-flow)
-[![Build Status](https://travis-ci.org/kerimdzhanov/dotenv-flow.svg?branch=master)](https://travis-ci.org/kerimdzhanov/dotenv-flow)
-[![dependencies status](https://david-dm.org/kerimdzhanov/dotenv-flow/status.svg)](https://david-dm.org/kerimdzhanov/dotenv-flow)
 [![Known Vulnerabilities](https://snyk.io/test/github/kerimdzhanov/dotenv-flow/badge.svg?targetFile=package.json)](https://snyk.io/test/github/kerimdzhanov/dotenv-flow?targetFile=package.json)
-[![node version](https://badgen.net/npm/node/dotenv-flow)](https://nodejs.org/en/about/releases)
-
+[![npm downloads](https://badgen.net/npm/dw/dotenv-flow)](https://www.npmjs.com/package/dotenv-flow)
 
 ## Installation
 
@@ -30,16 +33,50 @@ Using Yarn:
 $ yarn add dotenv-flow
 ```
 
+Using PNPM:
+
+```sh
+$ pnpm add dotenv-flow
+```
+
 
 ## Usage
 
-As early as possible in your application, require and configure **dotenv-flow**.
+As early as possible in your Node.js app, initialize **dotenv-flow**:
 
 ```js
 require('dotenv-flow').config();
 ```
 
-After this, you can access all the environment variables you have defined in your `.env*` files through `process.env.*`.
+It will allow you to configure and use **dotenv-flow** from your code programmatically.
+
+If you're using TypeScript or ES Modules:
+
+```ts
+import dotenvFlow from 'dotenv-flow';
+dotenvFlow.config();
+```
+
+Alternatively, you can use the default config entry point that allows you to configure **dotenv-flow** using command switch flags or predefined environment variables:
+
+```js
+require('dotenv-flow/config');
+```
+
+Or even make **dotenv-flow** load environment variables for your app without adding it to the code using preload technique:
+
+```sh
+$ node -r "dotenv-flow/config" your_app.js
+```
+
+It works with `ts-node` as well:
+
+```sh
+$ ts-node -r "dotenv-flow/config" your_app.ts
+```
+
+### How it works
+Once **dotenv-flow** is initialized (using `.config` or any other method above), environment variables defined in your `.env*` files are loaded and become accessible in your Node.js app via `process.env.*`.
 
 For example, let's suppose that you have the following `.env*` files in your project:
 
@@ -261,17 +298,22 @@ Then at every place `.env` is mentioned in the docs, read it as: "`.env.defaults
 
 ## `dotenv-flow/config` options
 
-When preloading **dotenv-flow** using the node's `-r` switch you can use the following configuration options:
+The following configuration options can be used when:
+- a) preloading **dotenv-flow** using Node's `-r` (`[ts-]node --require`) switch, or…
+- b) `require`ing the `dotenv-flow/config` entry point (using `require('dotenv-flow/config');`).
 
 ### Environment variables
 
 * `NODE_ENV` => [`options.node_env`](#optionsnode_env);
 * `DEFAULT_NODE_ENV` => [`options.default_node_env`](#optionsdefault_node_env);
 * `DOTENV_FLOW_PATH` => [`options.path`](#optionspath);
+* `DOTENV_FLOW_PATTERN` => [`options.pattern`](#optionspattern);
 * `DOTENV_FLOW_ENCODING` => [`options.encoding`](#optionsencoding);
 * `DOTENV_FLOW_PURGE_DOTENV` => [`options.purge_dotenv`](#optionspurge_dotenv);
+* `DOTENV_FLOW_DEBUG` => [`options.debug`](#optionsdebug);
 * `DOTENV_FLOW_SILENT` => [`options.silent`](#optionssilent);
 
+##### _for example:_
 ```sh
 $ NODE_ENV=production DOTENV_FLOW_PATH=/path/to/env-files-dir node -r dotenv-flow/config your_script.js
 ```
@@ -281,14 +323,17 @@ $ NODE_ENV=production DOTENV_FLOW_PATH=/path/to/env-files-dir node -r dotenv-flo
 * `--node-env` => [`options.node_env`](#optionsnode_env);
 * `--default-node-env` => [`options.default_node_env`](#optionsdefault_node_env);
 * `--dotenv-flow-path` => [`options.path`](#optionspath);
+* `--dotenv-flow-pattern` => [`options.pattern`](#optionspattern);
 * `--dotenv-flow-encoding` => [`options.encoding`](#optionsencoding);
 * `--dotenv-flow-purge-dotenv` => [`options.purge_dotenv`](#optionspurge_dotenv);
+* `--dotenv-flow-debug` => [`options.debug`](#optionsdebug);
 * `--dotenv-flow-silent` => [`options.silent`](#optionssilent);
 
-Don't forget to separate **dotenv-flow/config**-specific CLI switches with `--` because they are not recognized by **Node.js**:
+> Make sure that **dotenv-flow/config**-specific CLI switches are separated from Node's by `--` (double dash) since they are not recognized by **Node.js**.
 
+##### _for example:_
 ```sh
-$ node -r dotenv-flow/config your_script.js -- --dotenv-flow-encoding=latin1 --dotenv-flow-path=...
+$ node --require dotenv-flow/config your_script.js -- --dotenv-flow-path=/path/to/project --dotenv-flow-encoding=base64
 ```
 
 
@@ -296,9 +341,13 @@ $ node -r dotenv-flow/config your_script.js -- --dotenv-flow-encoding=latin1 --d
 
 #### `.config([options]) => object`
 
-The main entry point function that parses the contents of your `.env*` files, merges the results and appends to `process.env.*`.
+"dotenv-flow" initialization function (API entry point).
 
-Also, like the original module ([dotenv](https://github.com/motdotla/dotenv)), it returns an `object` with the `parsed` property containing the resulting key/values or the `error` property if the initialization is failed.
+Allows configuring dotenv-flow programmatically.
+
+Also, like the original module ([dotenv](https://github.com/motdotla/dotenv)),
+it returns an `object` with `.parsed` property containing the resulting
+`varname => values` pairs or `.error` property if the initialization is failed.
 
 ##### `options.node_env`
 ###### Type: `string`
@@ -363,6 +412,54 @@ require('dotenv-flow').config({
 
 If the option is not provided, the current working directory is used.
 
+##### `options.pattern`
+###### Type: `string`
+###### Default: `".env[.node_env][.local]"`
+
+Allows you to change the default `.env*` files' naming convention
+if you want to have a specific file naming structure for maintaining
+your environment variables' files.
+
+**Default Value**
+
+The default value `".env[.node_env][.local]"` makes *dotenv-flow* look up
+and load the following files in order:
+
+1. `.env`
+2. `.env.local`
+3. `.env.${NODE_ENV}`
+4. `.env.${NODE_ENV}.local`
+
+For example, when the `proess.env.NODE_ENV` (or `options.node_env`) is set to `"development"`,
+*dotenv-flow* will be looking for and parsing (if found) the following files:
+
+1. `.env`
+2. `.env.local`
+3. `.env.development`
+4. `.env.development.local`
+
+**Custom Pattern**
+
+Here is a couple of examples of customizing the `.env*` files naming convention:
+
+For example, if you set the pattern to `".env/[local/]env[.node_env]"`,
+*dotenv-flow* will look for these files instead:
+
+1. `.env/env`
+2. `.env/local/env`
+3. `.env/env.development`
+4. `.env/local/env.development`
+
+… or if you set the pattern to `".env/[.node_env/].env[.node_env][.local]"`,
+*dotenv-flow* will try to find and parse:
+
+1. `.env/.env`
+2. `.env/.env.local`
+3. `.env/development/.env.development`
+4. `.env/development/.env.development.local`
+
+› Please refer to [`.listFiles([options])`](#listfiles-options--string) to dive deeper.
+
 ##### `options.encoding`
 ###### Type: `string`
 ###### Default: `"utf8"`
@@ -394,11 +491,17 @@ require('dotenv-flow').config({
 });
 ```
 
+##### `options.debug`
+###### Type: `boolean`
+###### Default: `false`
+
+Enables detailed logging to debug why certain variables are not being set as you expect.
+
 ##### `options.silent`
 ###### Type: `boolean`
 ###### Default: `false`
 
-With this option you can suppress all the console outputs except errors and deprecation warnings.
+Suppresses all kinds of warnings including ".env*" files' loading errors.
 
 ```js
 require('dotenv-flow').config({
@@ -408,28 +511,90 @@ require('dotenv-flow').config({
 
 ---
 
-The following API considered as internal, but it is also exposed to give the ability to be used programmatically by your own needs.
+The following API is considered as internal, although it's exposed
+for programmatic use of **dotenv-flow** for your own project-specific needs.
 
 
-#### `.listDotenvFiles(dirname, [options]) => string[]`
+#### `.listFiles([options]) => string[]`
 
-Returns a list of `.env*` filenames depending on the given `options.node_env`. The resulting list is ordered by the env files priority from lowest to highest.
+Returns a list of existing `.env*` filenames depending on the given `options`.
 
-Also, note that the `.env.local` file will not be listed for `NODE_ENV="test"`, since normally you expect tests to produce the same results for everyone.
+The resulting list is ordered by the env files'
+variables overwriting priority from lowest to highest.
 
+This can also be referenced as "env files' environment cascade"
+or "order of ascending priority."
+
+⚠️ Note that the `.env.local` file is not listed for "test" environment,
+since normally you expect tests to produce the same results for everyone.
 
 ##### Parameters:
 
-##### `dirname`
-###### Type: `string`
-
-A path to `.env*` files' directory.
-
-##### `[options.node_env]`
+##### `options.node_env`
 ###### Type: `string`
 ###### Default: _undefined_
 
-The node environment (development/test/production/etc,).
+The node environment (a.k.a. `process.env.NODE_ENV`).
+
+The conventionally used values are `"development"`, `"test"`
+(or `"staging"`) and `"production"`, also commonly used are `"qa"`, `"uat"`, `"ci"`.
+
+
+##### `options.pattern`
+###### Type: `string`
+###### Default: `".env[.node_env][.local]"`
+
+`.env*` files' naming convention pattern.
+
+The default one, (`".env[.node_env][.local]"`) without `options.node_env` given,
+produces the following list of filenames:
+
+- `.env`
+- `.env.local`
+
+When `options.node_env` is set, for example to `"development"`,
+it appends "node_env-specific" filenames, that will make `.listFiles` to return:
+
+- `.env`
+- `.env.local`
+- `.env.development`
+- `.env.development.local`
+
+Another example might be the pattern `".env/[local/]env[.node_env]"`,
+that without `options.node_env` will produce:
+
+- `.env/env`
+- `.env/local/env`
+
+… and if `options.node_env` is set to (for example) `"development"`,
+will append "node_env-specific" files producing the following:
+
+- `.env/env`
+- `.env/local/env`
+- `.env/env.development`
+- `.env/local/development`
+
+Also, note that if `[node_env]` placeholders is missing in the pattern,
+none of the "node_env-specific" files fill be listed.
+For example, a pattern like `".env[.local]"`,
+independently of whether the `options.node_env` is set, will always produce:
+
+- `.env`
+- `.env.local`
+
+… except the case when `options.node_env` is set to `"test"`,
+which (as mentioned above) will exclude `.env.local` producing just a single:
+
+- `.env`
+
+… since normally we expect tests to produce the same results for everyone.
+
+
+##### `options.debug`
+###### Type: `boolean`
+###### Default: `false`
+
+Enables debug messages.
 
 
 ##### Returns:
@@ -444,10 +609,11 @@ A list of `.env*` filenames.
 ```js
 const dotenvFlow = require('dotenv-flow');
 
-const filenames = dotenvFlow.listDotenvFiles('/path/to/project', { node_env: 'development' });
+const filenames = dotenvFlow.listFiles({ node_env: 'development' });
 
 console.log(filenames); // will output the following:
-// > [ '/path/to/project/.env',
+// > [ '/path/to/project/.env.defaults',
+// >   '/path/to/project/.env',
 // >   '/path/to/project/.env.local',
 // >   '/path/to/project/.env.development',
 // >   '/path/to/project/.env.development.local' ]
@@ -468,11 +634,19 @@ When several filenames are given, the parsed variables are merged into a single 
 
 A filename or a list of filenames to parse.
 
-##### `[options.encoding]`
+
+##### `options.encoding`
 ###### Type: `string`
 ###### Default: `"utf8"`
 
 An optional encoding for reading files.
+
+
+##### `options.debug`
+###### Type: `boolean`
+###### Default: `false`
+
+Enables debug messages.
 
 
 ##### Returns:
@@ -524,24 +698,32 @@ But eventually, assigning the parsed environment variables to `process.env` is d
 
 A filename or a list of filenames to load.
 
-##### `[options.encoding]`
+##### `options.encoding`
 ###### Type: `string`
 ###### Default: `"utf8"`
 
 An optional encoding for reading files.
 
-##### `[options.silent]`
+##### `options.debug`
 ###### Type: `boolean`
 ###### Default: `false`
 
-Suppress all the console outputs except errors and deprecation warnings.
+Optionally, turn on debug messages.
+
+##### `options.silent`
+###### Type: `boolean`
+###### Default: `false`
+
+If enabled, suppresses all kinds of warnings including ".env*" files' loading errors.
 
 ##### Returns:
 
 ###### Type: `object`
 
-The returning object have the same shape as the `.config()`'s, it will contain the `parsed` property with a parsed content of a given file(s) or the `error` property if the parsing is failed.
-
+The same as `.config()`, the returning object contains
+`.parsed` property with a parsed content of the given file(s),
+or if parsing is failed the `.error` property with a reference
+to the reasoning error.
 
 ##### Example:
 
@@ -589,7 +771,7 @@ The environment variables that are predefined (i.e. by the shell) will not be un
 
 A filename or a list of filenames to unload.
 
-##### `[options.encoding]`
+##### `options.encoding`
 ###### Type: `string`
 ###### Default: `"utf8"`
 
@@ -666,4 +848,4 @@ $ yarn test
 
 ## License
 
-Licensed under [MIT](LICENSE) © 2018-2020 Dan Kerimdzhanov
+Licensed under [MIT](LICENSE) © 2018-2023 Dan Kerimdzhanov

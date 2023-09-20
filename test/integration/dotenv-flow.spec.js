@@ -85,7 +85,7 @@ describe('dotenv-flow.config (entry point)', () => {
     });
   });
 
-  describe('when the project contains node_env-specific files', () => {
+  describe('when the project contains "node_env-specific" files', () => {
     const directory = getFixtureProjectPath('node-env');
 
     it('merges environment variables prioritizing the node_env-specific', async () => {
@@ -138,7 +138,7 @@ describe('dotenv-flow.config (entry point)', () => {
     });
   });
 
-  describe('when the project contains node_env-specific `*.local` files', () => {
+  describe('when the project contains "node_env-specific" `*.local` files', () => {
     const directory = getFixtureProjectPath('node-env-local');
 
     it('merges environment variables prioritizing the node_env-specific local', async () => {
@@ -187,6 +187,19 @@ describe('dotenv-flow.config (entry point)', () => {
         DEFAULT_ENV_VAR: 'ok',
         PRODUCTION_ENV_VAR: 'ok',
         PRODUCTION_LOCAL_VAR: 'ok'
+      });
+    });
+  });
+
+  describe('when project contains symlinked `.env*` files', () => {
+    const workdir = getFixtureProjectPath('env-local-symlink');
+
+    it('reads from symlinked files', async () => {
+      const variables = await execHelper('print-env.js', workdir);
+
+      expect(variables).to.include({
+        DEFAULT_ENV_VAR: 'ok',
+        SYMLINKED_LOCAL_ENV_VAR: 'ok',
       });
     });
   });
