@@ -23,7 +23,6 @@ jobs:
           - windows-latest
           - macos-latest
         node-version:
-          - 12.x
           - 14.x
           - 16.x
           - 18.x
