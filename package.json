@@ -22,7 +22,9 @@
   "types": "lib/dotenv-flow.d.ts",
   "exports": {
     ".": "./lib/dotenv-flow.js",
-    "./config": "./config.js",
+    "./config": {
+      "require": "./config.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [

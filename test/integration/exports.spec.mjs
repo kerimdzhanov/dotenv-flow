@@ -32,9 +32,9 @@ describe('exports', () => {
     process.cwd.restore();
   });
 
-  describe('commonjs', () => {
+  describe('CommonJS', () => {
     it('should load module using require', () => {
-      const dotenv = require('../..')
+      const dotenv = require('dotenv-flow'); // self-require
 
       expect(dotenv).to.include.keys([
         'listFiles',
@@ -46,7 +46,7 @@ describe('exports', () => {
     });
   });
 
-  describe('esm', () => {
+  describe('ES Module', () => {
     it('should load module using import', async () => {
       const dotenv = await import('dotenv-flow'); // self-import
 
@@ -58,11 +58,6 @@ describe('exports', () => {
         'unload',
         'default'
       ]);
-    });
-
-    it('should load config entry point', async () => {
-      // just checking that it doesn't throw, ideally should test that it loads some env too
-      await import('dotenv-flow/config'); // self-import
     });
   });
 });

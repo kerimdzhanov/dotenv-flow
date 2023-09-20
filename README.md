@@ -50,29 +50,29 @@ require('dotenv-flow').config();
 
 It will allow you to configure and use **dotenv-flow** from your code programmatically.
 
+If you're using TypeScript or ES Modules:
+
+```ts
+import dotenvFlow from 'dotenv-flow';
+dotenvFlow.config();
+```
+
 Alternatively, you can use the default config entry point that allows you to configure **dotenv-flow** using command switch flags or predefined environment variables:
 
 ```js
 require('dotenv-flow/config');
 ```
 
-Or, you may want **dotenv-flow** to load environment variables for your app without adding it to the code via Node's `--require` flag, for example:
+Or even make **dotenv-flow** load environment variables for your app without adding it to the code using preload technique:
 
 ```sh
 $ node -r "dotenv-flow/config" your_app.js
 ```
 
-If you're using TypeScript (or ES6+ modules), to import the default config entry point (and configure **dotenv-flow** via CLI switches or env vars):
+It works with `ts-node` as well:
 
-```ts
-import 'dotenv-flow/config';
-```
-
-Or, to use/configure it programmatically:
-
-```ts
-import dotenvFlow from 'dotenv-flow';
-dotenvFlow.config();
+```sh
+$ ts-node -r "dotenv-flow/config" your_app.ts
 ```
 
 ### How it works
@@ -299,8 +299,8 @@ Then at every place `.env` is mentioned in the docs, read it as: "`.env.defaults
 ## `dotenv-flow/config` options
 
 The following configuration options can be used when:
-  a) preloading **dotenv-flow** using Node's `-r` (`[ts-]node --require`) switch, or…
-  b) `import`ing the `dotenv-flow/config` entry point.
+- a) preloading **dotenv-flow** using Node's `-r` (`[ts-]node --require`) switch, or…
+- b) `require`ing the `dotenv-flow/config` entry point (using `require('dotenv-flow/config');`).
 
 ### Environment variables
 
