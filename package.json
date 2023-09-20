@@ -1,6 +1,6 @@
 {
   "name": "dotenv-flow",
-  "version": "3.3.0",
+  "version": "4.0.0-rc.1",
   "description": "Loads environment variables from `.env.[development|test|production][.local]` files",
   "keywords": [
     "dotenv",
@@ -8,7 +8,10 @@
     "development",
     "test",
     "production",
-    "local"
+    "local",
+    "env",
+    "environment",
+    "variables"
   ],
   "homepage": "https://github.com/kerimdzhanov/dotenv-flow#readme",
   "repository": {
@@ -46,7 +49,7 @@
     "typescript": "^5.2.2"
   },
   "engines": {
-    "node": ">= 8.0.0"
+    "node": ">= 12.0.0"
   },
   "scripts": {
     "test": "yarn run test:unit && yarn run test:integration && yarn run test:types",

@@ -1,3 +1,27 @@
+# [4.0.0-rc.1](https://github.com/kerimdzhanov/dotenv-flow/compare/v3.3.0...v4.0.0-rc.1) (2023-09-20)
+
+### Features
+
+* **dotenv-flow:** add `options.pattern` for customizing `.env*` files' naming convention, closes [#8](https://github.com/kerimdzhanov/dotenv-flow/issues/8) ([#71](https://github.com/kerimdzhanov/dotenv-flow/issues/71)) ([f77c553](https://github.com/kerimdzhanov/dotenv-flow/commit/f77c55383e78b153753cf8027ce8d2b408fa96cc))
+* **dotenv-flow:** add debug messaging and errors warning ([#76](https://github.com/kerimdzhanov/dotenv-flow/issues/76)) ([7656b50](https://github.com/kerimdzhanov/dotenv-flow/commit/7656b5078c7a4c28c74e8111035743c9929c3bce))
+* **dotenv-flow:** add type definitions ([#77](https://github.com/kerimdzhanov/dotenv-flow/issues/77)) ([be94089](https://github.com/kerimdzhanov/dotenv-flow/commit/be940897d3bdbcc434df89e96931a1c2d32cd8df))
+* **dotenv-flow:** remove deprecated `options.cwd` ([#72](https://github.com/kerimdzhanov/dotenv-flow/issues/72)) ([3b3956c](https://github.com/kerimdzhanov/dotenv-flow/commit/3b3956c4ddb12c380f07b36ac0dcba56b7b4b003))
+* **dotenv-flow:** return error if none of the `.env*` files is found ([#70](https://github.com/kerimdzhanov/dotenv-flow/issues/70)) ([80ff430](https://github.com/kerimdzhanov/dotenv-flow/commit/80ff430783fcf7e76c4ecdd58be0965efd1bf94a)), closes [#41](https://github.com/kerimdzhanov/dotenv-flow/issues/41)
+* **dotenv-flow:** rework `.listFiles` to return only existing files + their full paths ([#75](https://github.com/kerimdzhanov/dotenv-flow/issues/75)) ([b1b0497](https://github.com/kerimdzhanov/dotenv-flow/commit/b1b04971bbc4fdfb64acb9c7d3b9f33caf89434f))
+* **dotenv:** upgrade dotenv to v16.0.0 ([#54](https://github.com/kerimdzhanov/dotenv-flow/issues/54)) ([778938c](https://github.com/kerimdzhanov/dotenv-flow/commit/778938cee2915c4fad511ececa6f4cc6f50eeccd))
+
+### BREAKING CHANGES
+
+* **dotenv-flow:** New type definitions do replace the `@types/dotenv-flow` package but might be conflicting.
+  The recommendation is to remove `@types/dotenv-flow` from dependencies if using dotenv-flow v4 or above.
+* **dotenv-flow:** Deprecated `options.cwd` has been removed, use `options.path` instead.
+* **dotenv-flow:** The exposed internal API method `.listDotenvFiles(dirname, options)` is replaced with `.listFiles(options)`.
+  The new method receives optional `options.path`, `options.node_env`, and `options.pattern` and returns a list of existing `.env*` files.
+* **dotenv:** Dropped Node.js versions support prior to v12.
+* **dotenv:** Added multiline values, inline comments, and backticks support.
+  Please check the contents of your `.env*` files and make sure that
+  all the `#` and backtick symbols are properly quoted if they are part of the value.
+
 # [3.3.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v3.2.0...v3.3.0) (2023-08-26)
 
 
