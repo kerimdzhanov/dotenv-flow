@@ -33,7 +33,7 @@
     "config.js"
   ],
   "dependencies": {
-    "dotenv": "^8.6.0"
+    "dotenv": "^16.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.6.2",
