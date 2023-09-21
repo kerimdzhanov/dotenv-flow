@@ -31,8 +31,10 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "lib/env-options.js",
     "lib/cli-options.js",
+    "lib/dotenv-flow.d.ts",
+    "lib/env-options.js",
+    "config.d.ts",
     "config.js"
   ],
   "dependencies": {
