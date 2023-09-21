@@ -1,3 +1,12 @@
+# [4.0.0-rc.2](https://github.com/kerimdzhanov/dotenv-flow/compare/v4.0.0-rc.1...v4.0.0-rc.2) (2023-09-21)
+
+
+### Bug Fixes
+
+* **dotenv-flow:** mark typings' files as "publishing to npm" ([7092f3f](https://github.com/kerimdzhanov/dotenv-flow/commit/7092f3f9c2c3bffac2ac4119396f33c7169b080a))
+
+
+
 # [4.0.0-rc.1](https://github.com/kerimdzhanov/dotenv-flow/compare/v3.3.0...v4.0.0-rc.1) (2023-09-20)
 
 ### Features
