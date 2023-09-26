@@ -1,3 +1,12 @@
+# [4.0.0-rc.3](https://github.com/kerimdzhanov/dotenv-flow/compare/v4.0.0-rc.2...v4.0.0-rc.3) (2023-09-26)
+
+
+### Features
+
+* **dotenv-flow:api:** expose `DEFAULT_PATTERN` ([a0dce78](https://github.com/kerimdzhanov/dotenv-flow/commit/a0dce7892bc4abca87fbbc5d4f88bb272ab28ad1))
+
+
+
 # [4.0.0-rc.2](https://github.com/kerimdzhanov/dotenv-flow/compare/v4.0.0-rc.1...v4.0.0-rc.2) (2023-09-21)
 
 
