@@ -1,15 +1,15 @@
-import dotenvFlow from '../../lib/dotenv-flow';
+import dotenvFlow, { DEFAULT_PATTERN } from '../../lib/dotenv-flow';
 
 const filenames: string[] = dotenvFlow.listFiles();
 dotenvFlow.listFiles({});
 dotenvFlow.listFiles({ node_env: 'development' });
 dotenvFlow.listFiles({ path: '/path/to/project' });
-dotenvFlow.listFiles({ pattern: '.env[.node_env][.local]' });
+dotenvFlow.listFiles({ pattern: DEFAULT_PATTERN });
 dotenvFlow.listFiles({ debug: true });
 dotenvFlow.listFiles({
   node_env: 'development',
   path: '/path/to/project',
-  pattern: '.env[.node_env][.local]',
+  pattern: DEFAULT_PATTERN,
   debug: true
 });
 

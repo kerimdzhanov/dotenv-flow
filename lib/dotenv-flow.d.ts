@@ -1,5 +1,9 @@
 import { ObjectEncodingOptions } from 'node:fs';
 
+export const DEFAULT_PATTERN: string;
+
+// --
+
 export type DotenvFlowListFilesOptions = {
     node_env?: string;
     path?: string;
@@ -125,6 +129,7 @@ export function config<T extends DotenvFlowParseResult = DotenvFlowParseResult>(
 // --
 
 declare const DotenvFlow: {
+  DEFAULT_PATTERN: typeof DEFAULT_PATTERN;
   listFiles: typeof listFiles;
   parse: typeof parse;
   load: typeof load;
