@@ -1,5 +1,9 @@
 import { ObjectEncodingOptions } from 'node:fs';
 
+export const DEFAULT_PATTERN: string;
+
+// --
+
 export type DotenvFlowListFilesOptions = {
     node_env?: string;
     path?: string;
@@ -39,28 +43,17 @@ export type DotenvFlowParseResult = {
 };
 
 /**
- * Parses a given file and returns an object (map) of `varname => value` entries.
+ * Parses a given file (or a list of files) returning an object (map) of `varname => value` entries.
  *
- * @param filename - the name of the file to parse
+ * When a list of filenames is given, files are parsed and merged in the same order as given.
+ * For example, if `['.env', '.env.local']` is given, variables defined in `.env.local`
+ * (the second one) will overwrite those are defined in `.env` (the first one) while merging.
+ *
+ * @param filenames - the name of the file (or a list of filenames) to parse
  * @param options - parse options
  */
 export function parse<T extends DotenvFlowParseResult = DotenvFlowParseResult>(
-  filename: string,
-  options?: DotenvFlowParseOptions
-): T;
-
-/**
- * Parses a list of given files and returns a merged object (map) of `varname => value` entries.
- *
- * Note that files are parsed and merged in the same order as given. For example,
- * if `['.env', '.env.local']` is given, variables defined in `.env.local` (the second one)
- * will overwrite those are defined in `.env` (the first one) while merging.
- *
- * @param filenames - a list of filenames to parse and merge
- * @param options - parse options
- */
-export function parse<T extends DotenvFlowParseResult = DotenvFlowParseResult>(
-  filenames: string[],
+  filenames: string | string[],
   options?: DotenvFlowParseOptions
 ): T;
 
@@ -76,44 +69,44 @@ export type DotenvFlowLoadResult<T extends DotenvFlowParseResult = DotenvFlowPar
 };
 
 /**
- * Parses and assigns variables defined in a given file to `process.env`.
+ * Parses variables defined in given file(s) and assigns them to `process.env`.
  *
- * @param filename - the name of the file to load from
+ * Variables that are already defined in `process.env` will not be overwritten,
+ * thus giving a higher priority to environment variables predefined by the shell.
+ *
+ * If the loading is successful, an object with `parsed` property is returned.
+ * The `parsed` property contains parsed variables' `key => value` pairs merged in order using
+ * the "overwrite merge" strategy.
+ *
+ * If parsing fails for any of the given files, `process.env` is being left untouched,
+ * and an object with `error` property is returned.
+ * The `error` property, if present, references to the occurred error.
+ *
+ * @param filenames - the name of the file (or a list of filenames) to load from
  * @param options - parse/load options
  */
 export function load<T extends DotenvFlowParseResult = DotenvFlowParseResult>(
-  filename: string,
+  filenames: string | string[],
   options?: DotenvFlowLoadOptions
-): DotenvFlowLoadResult<T>;
-
-/**
- * Parses, merges, and assigns variables from the given files to `process.env`.
- *
- * @param filenames - a list of filenames to load from
- * @param options - parse/load options
- */
-export function load<T extends DotenvFlowParseResult = DotenvFlowParseResult>(
-    filenames: string[],
-    options?: DotenvFlowLoadOptions
 ): DotenvFlowLoadResult<T>;
 
 // --
 
 /**
- * Unload variables defined in a given file from `process.env`.
+ * Unload variables defined in a given file(s) from `process.env`.
  *
- * @param filename - the name of the file to unload
+ * This function can gracefully resolve the following issue:
+ *
+ * In some cases, the original "dotenv" library can be used by one of the dependent npm modules.
+ * It causes calling the original `dotenv.config()` that loads the `.env` file from your project before you can call `dotenv-flow.config()`.
+ * Such cases break `.env*` files priority because the previously loaded environment variables are treated as shell-defined thus having a higher priority.
+ *
+ * Unloading the previously loaded `.env` file can also be activated when using the `dotenv-flow.config()` with the `purge_dotenv` option set to `true`.
+ *
+ * @param filenames - the name of the file (or a list of filenames) to unload
  * @param options - parse/unload options
  */
-export function unload(filename: string, options?: DotenvFlowParseOptions): void;
-
-/**
- * Unload variables defined in given files from `process.env`.
- *
- * @param filenames - a list of filenames to unload
- * @param options - parse/unload options
- */
-export function unload(filenames: string[], options?: DotenvFlowParseOptions): void;
+export function unload(filenames: string | string[], options?: DotenvFlowParseOptions): void;
 
 // --
 
@@ -136,6 +129,7 @@ export function config<T extends DotenvFlowParseResult = DotenvFlowParseResult>(
 // --
 
 declare const DotenvFlow: {
+  DEFAULT_PATTERN: typeof DEFAULT_PATTERN;
   listFiles: typeof listFiles;
   parse: typeof parse;
   load: typeof load;
