@@ -26,7 +26,8 @@
   "exports": {
     ".": "./lib/dotenv-flow.js",
     "./config": {
-      "require": "./config.js"
+      "require": "./config.js",
+      "node": "./config.js"
     },
     "./package.json": "./package.json"
   },
