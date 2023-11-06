@@ -1,6 +1,6 @@
 {
   "name": "dotenv-flow",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Loads environment variables from `.env.[development|test|production][.local]` files",
   "keywords": [
     "dotenv",

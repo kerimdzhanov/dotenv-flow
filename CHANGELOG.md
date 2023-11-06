@@ -1,3 +1,12 @@
+## [4.0.1](https://github.com/kerimdzhanov/dotenv-flow/compare/v4.0.0...v4.0.1) (2023-11-06)
+
+
+### Bug Fixes
+
+* **dotenv-flow:preload:** add `node` resolver for `exports:./config` field, fixes [#81](https://github.com/kerimdzhanov/dotenv-flow/issues/81) ([#82](https://github.com/kerimdzhanov/dotenv-flow/issues/82)) ([74b211b](https://github.com/kerimdzhanov/dotenv-flow/commit/74b211baec25b3b3de292c325356323f6c61e67b))
+
+
+
 # [4.0.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v3.3.0...v4.0.0) (2023-09-28)
 
 
