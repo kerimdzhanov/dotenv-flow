@@ -460,6 +460,24 @@ For example, if you set the pattern to `".env/[local/]env[.node_env]"`,
 
 › Please refer to [`.listFiles([options])`](#listfiles-options--string) to dive deeper.
 
+##### `options.files`
+###### Type: `string[]`
+
+Allows explicitly specifying a list (and the order) of `.env*` files to load.
+
+Note that options like `node_env`, `default_node_env`, and `pattern` are ignored in this case.
+
+```js
+require('dotenv-flow').config({
+  files: [
+    '.env',
+    '.env.local',
+    `.env.${process.env.NODE_ENV}`, // '.env.development'
+    `.env.${process.env.NODE_ENV}.local` // '.env.development.local'
+  ]
+});
+```
+
 ##### `options.encoding`
 ###### Type: `string`
 ###### Default: `"utf8"`

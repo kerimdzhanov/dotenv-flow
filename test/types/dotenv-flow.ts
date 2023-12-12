@@ -84,6 +84,7 @@ dotenvFlow.config({ node_env: 'production' });
 dotenvFlow.config({ default_node_env: 'development' });
 dotenvFlow.config({ path: '/path/to/project' });
 dotenvFlow.config({ pattern: '.env[.node_env][.local]' });
+dotenvFlow.config({ files: ['.env', '.env.local'] });
 dotenvFlow.config({ encoding: 'utf8' });
 dotenvFlow.config({ purge_dotenv: true });
 dotenvFlow.config({ debug: true });
@@ -93,6 +94,7 @@ dotenvFlow.config({
   default_node_env: 'development',
   path: '/path/to/project',
   pattern: '.env[.node_env][.local]',
+  files: ['.env', '.env.local'],
   encoding: 'utf8',
   purge_dotenv: true,
   debug: true,

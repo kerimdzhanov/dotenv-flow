@@ -113,6 +113,7 @@ export function unload(filenames: string | string[], options?: DotenvFlowParseOp
 export type DotenvFlowConfigOptions = DotenvFlowListFilesOptions & DotenvFlowLoadOptions & {
   default_node_env?: string;
   purge_dotenv?: boolean;
+  files?: string[];
 }
 
 export type DotenvFlowConfigResult<T extends DotenvFlowParseResult = DotenvFlowParseResult> = DotenvFlowLoadResult<T>;

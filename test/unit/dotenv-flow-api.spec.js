@@ -1465,6 +1465,211 @@ describe('dotenv-flow (API)', () => {
       });
     });
 
+    describe('when `options.files` is given', () => {
+      let options;
+
+      beforeEach('setup `options.files`', () => {
+        options = {
+          files: [
+            '.env',
+            '.env.production',
+            '.env.local'
+          ]
+        };
+      });
+
+      it('loads the given list of files', () => {
+        mockFS({
+          '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+          '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok',
+          '/path/to/project/.env.production': 'PRODUCTION_ENV_VAR=ok',
+          '/path/to/project/.env.production.local': 'LOCAL_PRODUCTION_ENV_VAR=ok'
+        });
+
+        expect(process.env)
+          .to.not.have.keys([
+            'DEFAULT_ENV_VAR',
+            'PRODUCTION_ENV_VAR',
+            'LOCAL_ENV_VAR',
+            'LOCAL_PRODUCTION_ENV_VAR'
+          ]);
+
+        const result = dotenvFlow.config(options);
+
+        expect(result)
+          .to.be.an('object')
+          .with.property('parsed')
+          .that.deep.equals({
+            DEFAULT_ENV_VAR: 'ok',
+            PRODUCTION_ENV_VAR: 'ok',
+            LOCAL_ENV_VAR: 'ok'
+          });
+
+        expect(process.env)
+          .to.include({
+            DEFAULT_ENV_VAR: 'ok',
+            PRODUCTION_ENV_VAR: 'ok',
+            LOCAL_ENV_VAR: 'ok'
+          });
+
+        expect(process.env)
+          .to.not.have.key('LOCAL_PRODUCTION_ENV_VAR');
+      });
+
+      it('ignores `options.node_env`', () => {
+        options.node_env = 'development';
+
+        mockFS({
+          '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok',
+          '/path/to/project/.env.local': 'LOCAL_ENV_VAR=ok',
+          '/path/to/project/.env.development': 'DEVELOPMENT_ENV_VAR=ok',
+          '/path/to/project/.env.production': 'PRODUCTION_ENV_VAR=ok'
+        });
+
+        expect(process.env)
+          .to.not.have.keys([
+            'DEFAULT_ENV_VAR',
+            'DEVELOPMENT_ENV_VAR',
+            'PRODUCTION_ENV_VAR',
+            'LOCAL_ENV_VAR'
+          ]);
+
+        const result = dotenvFlow.config(options);
+
+        expect(result)
+          .to.be.an('object')
+          .with.property('parsed')
+          .that.deep.equals({
+            DEFAULT_ENV_VAR: 'ok',
+            PRODUCTION_ENV_VAR: 'ok',
+            LOCAL_ENV_VAR: 'ok'
+          });
+
+        expect(process.env)
+          .to.include({
+            DEFAULT_ENV_VAR: 'ok',
+            PRODUCTION_ENV_VAR: 'ok',
+            LOCAL_ENV_VAR: 'ok'
+          });
+
+        expect(process.env)
+          .to.not.have.key('DEVELOPMENT_ENV_VAR');
+      });
+
+      it('loads the list of files in the given order', () => {
+        mockFS({
+          '/path/to/project/.env': (
+            'DEFAULT_ENV_VAR=ok\n' +
+            'PRODUCTION_ENV_VAR="should be overwritten by `.env.production"`'
+          ),
+          '/path/to/project/.env.local': (
+            'LOCAL_ENV_VAR=ok'
+          ),
+          '/path/to/project/.env.production': (
+            'LOCAL_ENV_VAR="should be overwritten by `.env.local"`\n' +
+            'PRODUCTION_ENV_VAR=ok'
+          )
+        });
+
+        expect(process.env)
+          .to.not.have.keys([
+            'DEFAULT_ENV_VAR',
+            'PRODUCTION_ENV_VAR',
+            'LOCAL_ENV_VAR'
+          ]);
+
+        const result = dotenvFlow.config(options);
+
+        expect(result)
+          .to.be.an('object')
+          .with.property('parsed')
+          .that.deep.equals({
+            DEFAULT_ENV_VAR: 'ok',
+            PRODUCTION_ENV_VAR: 'ok',
+            LOCAL_ENV_VAR: 'ok'
+          });
+
+        expect(process.env)
+          .to.include({
+            DEFAULT_ENV_VAR: 'ok',
+            PRODUCTION_ENV_VAR: 'ok',
+            LOCAL_ENV_VAR: 'ok'
+          });
+      });
+
+      it('ignores missing files', () => {
+        mockFS({
+          '/path/to/project/.env': 'DEFAULT_ENV_VAR=ok'
+        });
+
+        expect(process.env)
+          .to.not.have.keys([
+            'DEFAULT_ENV_VAR',
+            'PRODUCTION_ENV_VAR',
+            'LOCAL_ENV_VAR'
+          ]);
+
+        const result = dotenvFlow.config(options);
+
+        expect(result)
+          .to.be.an('object')
+          .with.property('parsed')
+          .that.deep.equals({
+            DEFAULT_ENV_VAR: 'ok'
+          });
+
+        expect(process.env)
+          .to.include({
+            DEFAULT_ENV_VAR: 'ok'
+          });
+
+        expect(process.env)
+          .to.not.have.keys([
+            'PRODUCTION_ENV_VAR',
+            'LOCAL_ENV_VAR'
+          ]);
+      });
+
+      describe('… and `options.path` is given', () => {
+        beforeEach('setup `options.path`', () => {
+          options.path = '/path/to/another/project';
+        });
+
+        it('uses the given `options.path` as a working directory', () => {
+          mockFS({
+            '/path/to/another/project/.env': 'DEFAULT_ENV_VAR=ok',
+            '/path/to/another/project/.env.production': 'PRODUCTION_ENV_VAR=ok',
+            '/path/to/another/project/.env.local': 'LOCAL_ENV_VAR=ok'
+          });
+
+          expect(process.env)
+            .to.not.have.keys([
+            'DEFAULT_ENV_VAR',
+            'PRODUCTION_ENV_VAR',
+            'LOCAL_ENV_VAR'
+          ]);
+
+          const result = dotenvFlow.config(options);
+
+          expect(result)
+            .to.be.an('object')
+            .with.property('parsed')
+            .that.deep.equals({
+              DEFAULT_ENV_VAR: 'ok',
+              PRODUCTION_ENV_VAR: 'ok',
+              LOCAL_ENV_VAR: 'ok'
+            });
+
+          expect(process.env)
+            .to.include({
+              DEFAULT_ENV_VAR: 'ok',
+              PRODUCTION_ENV_VAR: 'ok',
+              LOCAL_ENV_VAR: 'ok'
+            });
+        });
+      });
+    });
+
     describe('when `options.encoding` is given', () => {
       let options;
 
@@ -1560,9 +1765,7 @@ describe('dotenv-flow (API)', () => {
       let options;
 
       beforeEach('setup `options.debug`', () => {
-        options = {
-          debug: true
-        };
+        options = { debug: true };
       });
 
       beforeEach('stub `console.debug`', () => {
@@ -1656,6 +1859,31 @@ describe('dotenv-flow (API)', () => {
 
         expect(console.debug)
           .to.have.been.calledWithMatch('options.silent', false);
+      });
+
+      it('prints out initialization options [4]', () => {
+        dotenvFlow.config({
+          ...options,
+          path: '/path/to/another/project',
+          files: [
+            '.env',
+            '.env.production',
+            '.env.local'
+          ],
+        });
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch(/dotenv-flow\b.*init/);
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch('options.path', '/path/to/another/project');
+
+        expect(console.debug)
+          .to.have.been.calledWithMatch('options.files', [
+            '.env',
+            '.env.production',
+            '.env.local'
+          ]);
       });
 
       it('prints out effective node_env set by `options.node_env`', () => {
