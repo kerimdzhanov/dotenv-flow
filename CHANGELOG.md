@@ -1,3 +1,12 @@
+# [4.1.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v4.0.1...v4.1.0) (2023-12-26)
+
+
+### Features
+
+* **dotenv-flow:** implement `options.files`, closes [#83](https://github.com/kerimdzhanov/dotenv-flow/issues/83) ([#87](https://github.com/kerimdzhanov/dotenv-flow/issues/87)) ([6a47b2c](https://github.com/kerimdzhanov/dotenv-flow/commit/6a47b2c953acea1c48ebe730b8f357628c43a815))
+
+
+
 ## [4.0.1](https://github.com/kerimdzhanov/dotenv-flow/compare/v4.0.0...v4.0.1) (2023-11-06)
 
 
