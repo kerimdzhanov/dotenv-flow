@@ -24,8 +24,12 @@
   "main": "lib/dotenv-flow.js",
   "types": "lib/dotenv-flow.d.ts",
   "exports": {
-    ".": "./lib/dotenv-flow.js",
+    ".": {
+      "types": "./lib/dotenv-flow.d.ts",
+      "default": "./lib/dotenv-flow.js"
+    },
     "./config": {
+      "types": "./config.d.ts",
       "require": "./config.js",
       "node": "./config.js"
     },

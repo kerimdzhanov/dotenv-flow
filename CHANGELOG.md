@@ -1,3 +1,9 @@
+# Unreleased
+
+### Bug Fixes
+
+* **dotenv-flow:** when used in TypeScript, `"moduleResolution": "bundler"` (and `"node16"` and `"nodenext"`) should now work, closes [#96](https://github.com/kerimdzhanov/dotenv-flow/issues/96)
+
 # [4.1.0](https://github.com/kerimdzhanov/dotenv-flow/compare/v4.0.1...v4.1.0) (2023-12-26)
 
 
